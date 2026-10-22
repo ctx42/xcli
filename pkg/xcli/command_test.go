@@ -103,12 +103,12 @@ func Test_Command_Add(t *testing.T) {
 
 		// --- Then ---
 		assert.Same(t, root, have)
-		wantDesc := "" +
+		want := "" +
 			"cmd: root\n" +
 			"  cmd: sub-a\n" +
 			"  cmd: sub-b\n" +
 			"    cmd: sub-b-a\n"
-		assert.Equal(t, wantDesc, have.Describe())
+		assert.Equal(t, want, have.Describe())
 		assert.Same(t, root.MetaAll(), sa.MetaAll())
 		assert.Same(t, root.MetaAll(), sb.MetaAll())
 		assert.Same(t, root.MetaAll(), sba.MetaAll())
@@ -283,8 +283,8 @@ func Test_Command_ArgsRule(t *testing.T) {
 	err := cmd.Run(context.Background(), tst.Ring())
 
 	// --- Then ---
-	wMsg := "command `root` requires minimum 3 arguments 2 given"
-	assert.ErrorEqual(t, wMsg, err)
+	want := "command `root` requires minimum 3 arguments 2 given"
+	assert.ErrorEqual(t, want, err)
 	assert.Equal(t, []string{"arg0", "arg1"}, cmd.Args())
 }
 
@@ -409,12 +409,12 @@ func Test_Parse(t *testing.T) {
 
 		// --- Then ---
 		assert.NoError(t, err)
-		wantDesc := "" +
+		want := "" +
 			"cmd(sub-b): root --help false --root root-def\n" +
 			"  cmd: sub-a --sa 42\n" +
 			"  cmd: sub-b --help false --sb abc\n" +
 			"    cmd: sub-b-a --help false --sba sba-def\n"
-		assert.Equal(t, wantDesc, root.Describe())
+		assert.Equal(t, want, root.Describe())
 		assert.Equal(t, []string{"arg0", "arg1"}, root.Args())
 	})
 
@@ -451,8 +451,8 @@ func Test_Parse(t *testing.T) {
 		err := root.Parse(args...)
 
 		// --- Then ---
-		wMsg := `invalid value "abc" for flag -sa: parse error`
-		assert.ErrorEqual(t, wMsg, err)
+		want := `invalid value "abc" for flag -sa: parse error`
+		assert.ErrorEqual(t, want, err)
 	})
 
 	t.Run("required flag must be provided", func(t *testing.T) {
@@ -699,8 +699,8 @@ func Test_Command_Run(t *testing.T) {
 		err := root.Run(ctx, tst.Ring())
 
 		// --- Then ---
-		wMsg := "command `sub-a` requires no arguments 1 given"
-		assert.ErrorEqual(t, wMsg, err)
+		want := "command `sub-a` requires no arguments 1 given"
+		assert.ErrorEqual(t, want, err)
 		assert.Equal(t, []string{"arg0"}, root.Args())
 	})
 
@@ -714,8 +714,8 @@ func Test_Command_Run(t *testing.T) {
 		err := root.Run(ctx, tst.Ring())
 
 		// --- Then ---
-		wMsg := "not parsed arguments"
-		assert.ErrorEqual(t, wMsg, err)
+		want := "not parsed arguments"
+		assert.ErrorEqual(t, want, err)
 	})
 }
 

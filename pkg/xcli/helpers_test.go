@@ -37,8 +37,8 @@ func Test_Marshal(t *testing.T) {
 		tt := []struct {
 			testN string
 
-			v   any
-			exp string
+			v    any
+			want string
 		}{
 			{"error", errors.New("msg"), "msg"},
 			{"Marshaler", TMarshaler("test"), "test"},
@@ -57,11 +57,11 @@ func Test_Marshal(t *testing.T) {
 		for _, tc := range tt {
 			t.Run(tc.testN, func(t *testing.T) {
 				// --- When ---
-				got, err := Marshal(tc.v)
+				have, err := Marshal(tc.v)
 
 				// --- Then ---
 				assert.NoError(t, err)
-				assert.Equal(t, tc.exp, string(got))
+				assert.Equal(t, tc.want, string(have))
 			})
 		}
 	})
