@@ -24,6 +24,11 @@ type PreRun func(ctx context.Context, ccx *CmdCtx) (context.Context, error)
 
 // WithFlags is option for [NewCommand] setting flag set to use instead of
 // default empty flag set.
+//
+// Unlike the default flag set, the given one keeps its Usage function and
+// output, so on a parse error or a help request [flag.FlagSet] writes to its
+// output (standard error when not set) instead of the [ring.Ring] streams.
+// Set Usage to nil to have [Command.Run] print [Command.Help] instead.
 func WithFlags(fs *xflag.FlagSet) func(*Command) {
 	return func(cmd *Command) { cmd.hidFlagSet = fs }
 }
