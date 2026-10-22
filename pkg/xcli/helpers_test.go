@@ -151,7 +151,7 @@ func Test_RunCmd(t *testing.T) {
 		tst := ringtest.New(t)
 		fn := func(_ context.Context, _ *CmdCtx) error {
 			buf := &strings.Builder{}
-			buf.WriteString("panics with Stringer")
+			_, _ = buf.WriteString("panics with Stringer")
 			panic(buf)
 		}
 		cmd := NewCommand("root", fn)

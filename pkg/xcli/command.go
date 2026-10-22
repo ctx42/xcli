@@ -364,7 +364,7 @@ func (cmd *Command) desc(padding int, buf *strings.Builder) {
 	cmd.VisitAll(func(flg *flag.Flag) {
 		_, _ = fmt.Fprintf(buf, " --%s %v", flg.Name, flg.Value)
 	})
-	buf.WriteString("\n")
+	_, _ = buf.WriteString("\n")
 	for _, sub := range cmd.subs {
 		sub.desc(padding+1, buf)
 	}
@@ -383,17 +383,17 @@ func (cmd *Command) FullName() string {
 func (cmd *Command) Help() string {
 	var buf strings.Builder
 	header := fmt.Sprintf("Usage of %#q:\n", cmd.FullName())
-	buf.WriteString(header)
+	_, _ = buf.WriteString(header)
 	if cmd.longDesc != "" {
 		desc := fmt.Sprintf("\n  %s\n", cmd.longDesc)
-		buf.WriteString(desc)
+		_, _ = buf.WriteString(desc)
 	}
 	if cmd.longDesc == "" && cmd.shortDesc != "" {
 		desc := fmt.Sprintf("\n  %s\n", cmd.shortDesc)
-		buf.WriteString(desc)
+		_, _ = buf.WriteString(desc)
 	}
 	if len(cmd.examples) > 0 {
-		buf.WriteString("\nEXAMPLES:\n")
+		_, _ = buf.WriteString("\nEXAMPLES:\n")
 		tw := tabwriter.NewWriter(&buf, 0, 8, 4, ' ', 0)
 		for _, egd := range cmd.examples {
 			eg := egd[0]
@@ -406,7 +406,7 @@ func (cmd *Command) Help() string {
 		}
 		_ = tw.Flush()
 	}
-	buf.WriteString(cmd.help())
+	_, _ = buf.WriteString(cmd.help())
 	return buf.String()
 }
 
