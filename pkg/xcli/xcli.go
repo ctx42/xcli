@@ -1,6 +1,27 @@
 // SPDX-FileCopyrightText: (c) 2026 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
+// Package xcli is a framework for building command line programs.
+//
+// A program is a tree of [Command] values. Each command has a name, a flag
+// set, an optional [Func] holding its logic, and subcommands added with
+// [Command.Add]. [Command.Parse] parses the arguments and finds the command
+// to run, and [Command.Run] runs it after the [PreRun] functions of the
+// commands from the root down to it. Commands reach the program environment
+// and streams through the [github.com/ctx42/ring/pkg/ring.Ring] in their
+// [CmdCtx].
+//
+//	sub := xcli.NewCommand("version", versionFunc).
+//		ShortDesc("print the version")
+//	root := xcli.NewCommand("app", appFunc).
+//		UsageFlagName("help").
+//		Add(sub)
+//	root.BoolSL("help", "h", false, "show help")
+//
+//	if err := root.Parse(os.Args[1:]...); err != nil {
+//		return err
+//	}
+//	return xcli.RunCmd(ctx, ring.New(), root)
 package xcli
 
 import (
