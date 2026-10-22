@@ -31,7 +31,8 @@ environment, and the `xclitest` package wraps that setup for you.
 - `Execute` and `RunCmd` turn panics into errors and cancel the context on
   `SIGTERM`.
 - Terminal detection for standard output and standard error.
-- Test helpers in `xclitest` with captured streams and ready-made commands.
+- Test helpers in `xclitest` with captured streams and ready-made command
+  functions.
 
 ## Install
 
@@ -249,8 +250,8 @@ func Test_greet(t *testing.T) {
 ```
 
 `assert` comes from [ctx42/testing](https://github.com/ctx42/testing).
-`xclitest` also ships ready-made command functions (`DbgFunc`, `NopFunc`) and
-command trees for testing code that works with commands.
+`xclitest` also ships ready-made command functions: `DbgFunc` prints the
+command name and arguments, and `NopFunc` does nothing.
 
 ## License
 

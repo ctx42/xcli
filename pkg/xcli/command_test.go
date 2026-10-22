@@ -13,6 +13,7 @@ import (
 	"github.com/ctx42/xflag/pkg/xflag"
 	"github.com/ctx42/xrr/pkg/xrr/xrrtest"
 
+	"github.com/ctx42/xcli/pkg/xcli/internal/fixture"
 	"github.com/ctx42/xcli/pkg/xcli/xclitest"
 
 	. "github.com/ctx42/xcli/pkg/xcli"
@@ -417,7 +418,7 @@ func Test_Command_Execute(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStdout()
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 
 		// --- When ---
 		err := root.Execute(t.Context(), tst.Ring("sub-b", "arg0", "arg1"))
@@ -444,7 +445,7 @@ func Test_Command_Execute(t *testing.T) {
 	t.Run("error - parse", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 
 		// --- When ---
 		err := root.Execute(t.Context(), tst.Ring("--unknown"))
@@ -470,7 +471,7 @@ func Test_Command_Execute(t *testing.T) {
 func Test_Command_Parse(t *testing.T) {
 	t.Run("parse flags", func(t *testing.T) {
 		// --- Given ---
-		cmd := xclitest.TstCmd()
+		cmd := fixture.TstCmd()
 		cmd.Flags().String("str", "abc", "usage")
 
 		// --- When ---
@@ -484,7 +485,7 @@ func Test_Command_Parse(t *testing.T) {
 
 	t.Run("first level subcommand flag and arguments", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		args := []string{"sub-b", "--sb", "abc", "arg0", "arg1"}
 
 		// --- When ---
@@ -503,7 +504,7 @@ func Test_Command_Parse(t *testing.T) {
 
 	t.Run("error - unknown flag", func(t *testing.T) {
 		// --- Given ---
-		cmd := xclitest.TstCmd()
+		cmd := fixture.TstCmd()
 
 		// --- When ---
 		err := cmd.Parse("--unknown")
@@ -514,7 +515,7 @@ func Test_Command_Parse(t *testing.T) {
 
 	t.Run("optional string flag", func(t *testing.T) {
 		// --- Given ---
-		cmd := xclitest.TstCmd()
+		cmd := fixture.TstCmd()
 		cmd.Flags().String("str", "abc", "usage")
 
 		// --- When ---
@@ -527,7 +528,7 @@ func Test_Command_Parse(t *testing.T) {
 
 	t.Run("error - subcommand flag value", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		args := []string{"sub-a", "--sa", "abc"}
 
 		// --- When ---
@@ -540,7 +541,7 @@ func Test_Command_Parse(t *testing.T) {
 
 	t.Run("error - required flag not set", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmdRequired()
+		root := fixture.TstCmdRequired()
 		args := []string{"sub-b", "sub-b-a"}
 
 		// --- When ---
@@ -552,7 +553,7 @@ func Test_Command_Parse(t *testing.T) {
 
 	t.Run("root help requested", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		args := []string{"--help"}
 
 		// --- When ---
@@ -564,7 +565,7 @@ func Test_Command_Parse(t *testing.T) {
 
 	t.Run("subcommand help requested", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		args := []string{"sub-b", "--help"}
 
 		// --- When ---
@@ -576,7 +577,7 @@ func Test_Command_Parse(t *testing.T) {
 
 	t.Run("sub subcommand help requested", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		args := []string{"sub-b", "sub-b-a", "--help"}
 
 		// --- When ---
@@ -603,7 +604,7 @@ func Test_Command_Parse(t *testing.T) {
 func Test_Command_Find(t *testing.T) {
 	t.Run("find leaf command", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 
 		// --- When ---
 		have := root.Find("root", "sub-b", "sub-b-a")
@@ -615,7 +616,7 @@ func Test_Command_Find(t *testing.T) {
 
 	t.Run("find first level command", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 
 		// --- When ---
 		have := root.Find("root", "sub-b")
@@ -627,7 +628,7 @@ func Test_Command_Find(t *testing.T) {
 
 	t.Run("find root command", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 
 		// --- When ---
 		have := root.Find("root")
@@ -639,7 +640,7 @@ func Test_Command_Find(t *testing.T) {
 
 	t.Run("unknown leaf command", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 
 		// --- When ---
 		have := root.Find("root", "sub-b", "sub-b-a", "sub-b-a-a")
@@ -650,7 +651,7 @@ func Test_Command_Find(t *testing.T) {
 
 	t.Run("unknown command", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 
 		// --- When ---
 		have := root.Find("unknown")
@@ -673,7 +674,7 @@ func Test_Command_Find(t *testing.T) {
 
 	t.Run("root name repeated", func(t *testing.T) {
 		// --- Given ---
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 
 		// --- When ---
 		have := root.Find("root", "root")
@@ -745,7 +746,7 @@ func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
 	t.Run("pre-run of every command in chain", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStderr()
-		root := xclitest.TstCmdPreRun()
+		root := fixture.TstCmdPreRun()
 		root.MetaSet("my", 1)
 		assert.NoError(t, root.Parse("sub-b", "sub-b-a"))
 
@@ -762,7 +763,7 @@ func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
 	t.Run("pre-run of some commands in chain", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStderr()
-		root := xclitest.TstCmdPreRun()
+		root := fixture.TstCmdPreRun()
 		root.MetaSet("my", 1)
 		assert.NoError(t, root.Parse("sub-a", "sub-a-a"))
 
@@ -782,7 +783,7 @@ func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
 		}
 
 		tst := ringtest.New(t)
-		root := xclitest.TstCmdPreRun().PreRun(pre)
+		root := fixture.TstCmdPreRun().PreRun(pre)
 		root.MetaSet("my", 1)
 		assert.NoError(t, root.Parse("sub-a", "sub-a-a"))
 
@@ -799,7 +800,7 @@ func Test_Command_Run(t *testing.T) {
 	t.Run("run root without arguments", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStdout()
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		assert.NoError(t, root.Parse())
 
 		// --- When ---
@@ -819,7 +820,7 @@ func Test_Command_Run(t *testing.T) {
 	t.Run("run root with flag", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStdout()
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		assert.NoError(t, root.Parse("--root", "abc"))
 
 		// --- When ---
@@ -840,7 +841,7 @@ func Test_Command_Run(t *testing.T) {
 	t.Run("run first level subcommand flag", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStdout()
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		assert.NoError(t, root.Parse("sub-b", "--sb", "abc", "arg0", "arg1"))
 
 		// --- When ---
@@ -861,7 +862,7 @@ func Test_Command_Run(t *testing.T) {
 	t.Run("subcommand flag and arguments", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStdout()
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		args := []string{"sub-b", "--sb", "abc", "arg0", "arg1"}
 		assert.NoError(t, root.Parse(args...))
 
@@ -884,7 +885,7 @@ func Test_Command_Run(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
 		var usageRan bool
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		root.Flags().Usage = func() { usageRan = true }
 		assert.NoError(t, root.Parse("--help"))
 
@@ -900,7 +901,7 @@ func Test_Command_Run(t *testing.T) {
 	t.Run("show help for subcommand", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStderr()
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		assert.NoError(t, root.Parse("sub-b", "-h"))
 
 		// --- When ---
@@ -939,7 +940,7 @@ func Test_Command_Run(t *testing.T) {
 	t.Run("help before subcommand with required flag", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStderr()
-		root := xclitest.TstCmdRequired()
+		root := fixture.TstCmdRequired()
 		assert.NoError(t, root.Parse("sub-b", "-h", "sub-b-a"))
 
 		// --- When ---
@@ -961,7 +962,7 @@ func Test_Command_Run(t *testing.T) {
 	t.Run("error - arguments count", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 		assert.NoError(t, root.Parse("sub-a", "--sa", "44", "arg0"))
 
 		// --- When ---
@@ -991,7 +992,7 @@ func Test_Command_Run(t *testing.T) {
 	t.Run("error - not parsed", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
-		root := xclitest.TstCmd()
+		root := fixture.TstCmd()
 
 		// --- When ---
 		err := root.Run(t.Context(), tst.Ring())
@@ -1073,7 +1074,7 @@ func Test_Command_IsRoot(t *testing.T) {
 func Test_Command_FullName(t *testing.T) {
 	t.Run("root command", func(t *testing.T) {
 		// --- Given ---
-		cmd := xclitest.TstCmd()
+		cmd := fixture.TstCmd()
 
 		// --- When ---
 		have := cmd.FullName()
@@ -1084,7 +1085,7 @@ func Test_Command_FullName(t *testing.T) {
 
 	t.Run("subcommand", func(t *testing.T) {
 		// --- Given ---
-		cmd := xclitest.TstCmd().Find("sub-b", "sub-b-a")
+		cmd := fixture.TstCmd().Find("sub-b", "sub-b-a")
 
 		// --- When ---
 		have := cmd.FullName()
@@ -1097,7 +1098,7 @@ func Test_Command_FullName(t *testing.T) {
 func Test_Command_Help(t *testing.T) {
 	t.Run("help for root", func(t *testing.T) {
 		// --- Given ---
-		cmd := xclitest.TstCmd()
+		cmd := fixture.TstCmd()
 
 		// --- When ---
 		have := cmd.Help()
@@ -1123,7 +1124,7 @@ func Test_Command_Help(t *testing.T) {
 
 	t.Run("help for subcommand", func(t *testing.T) {
 		// --- Given ---
-		cmd := xclitest.TstCmd().Find("root", "sub-b")
+		cmd := fixture.TstCmd().Find("root", "sub-b")
 
 		// --- When ---
 		have := cmd.Help()

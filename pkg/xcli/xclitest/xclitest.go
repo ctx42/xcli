@@ -3,6 +3,6 @@
 
 // Package xclitest provides helpers for testing programs built with the
 // [github.com/ctx42/xcli/pkg/xcli] package: the [Tester] capturing program
-// streams and building commands with their contexts, and ready-made test
-// commands and command functions.
+// streams and building commands with their contexts, and ready-made command
+// functions.
 package xclitest

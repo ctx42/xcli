@@ -10,7 +10,7 @@ import (
 	"github.com/ctx42/ring/pkg/ring"
 	"github.com/ctx42/testing/pkg/assert"
 
-	"github.com/ctx42/xcli/pkg/xcli/xclitest"
+	"github.com/ctx42/xcli/pkg/xcli/internal/fixture"
 
 	. "github.com/ctx42/xcli/pkg/xcli"
 )
@@ -20,7 +20,7 @@ func Test_NewCmdCtx(t *testing.T) {
 	buf := &bytes.Buffer{}
 	rng := ring.New()
 	rng.SetStdout(buf)
-	cmd := xclitest.TstCmd()
+	cmd := fixture.TstCmd()
 
 	// --- When ---
 	ccx := NewCmdCtx(rng, cmd)
