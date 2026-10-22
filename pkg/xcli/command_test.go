@@ -1273,6 +1273,17 @@ func Test_Command_Help(t *testing.T) {
 		assert.Equal(t, want, have)
 	})
 
+	t.Run("multi-line long description", func(t *testing.T) {
+		// --- Given ---
+		cmd := NewCommand("cmd", nil).LongDesc("line 1\n\nline 3")
+
+		// --- When ---
+		have := cmd.Help()
+
+		// --- Then ---
+		assert.Equal(t, "Usage of `cmd`:\n\n  line 1\n\n  line 3\n", have)
+	})
+
 	t.Run("with short and long description", func(t *testing.T) {
 		// --- Given ---
 		cmd := NewCommand("cmd", nil).

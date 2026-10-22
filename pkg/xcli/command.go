@@ -455,7 +455,8 @@ func (cmd *Command) Help() string {
 	header := fmt.Sprintf("Usage of %#q:\n", cmd.FullName())
 	_, _ = buf.WriteString(header)
 	if cmd.longDesc != "" {
-		desc := fmt.Sprintf("\n  %s\n", cmd.longDesc)
+		desc := strings.ReplaceAll(cmd.longDesc, "\n", "\n  ")
+		desc = fmt.Sprintf("\n  %s\n", desc)
 		_, _ = buf.WriteString(desc)
 	}
 	if cmd.longDesc == "" && cmd.shortDesc != "" {
