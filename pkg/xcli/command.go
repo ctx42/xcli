@@ -301,9 +301,10 @@ func RunPreRun(ctx context.Context, ccx *CmdCtx) (context.Context, error) {
 	return ctx, nil
 }
 
-// GetFlagSet returns a flag set for the given command name (including self).
-// If the command by given name does not exist, it returns an "empty" flag set,
-// so you can still do chain method calls.
+// GetFlagSet returns the flag set of the command or of its closest ancestor
+// with the given name. Subcommands are not searched. If no such command
+// exists, it returns an "empty" flag set, so you can still do chain method
+// calls.
 func (cmd *Command) GetFlagSet(name string) *xflag.FlagSet {
 	if cmd.Name() == name {
 		return cmd.hidFlagSet
