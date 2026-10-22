@@ -5,13 +5,7 @@ package xcli
 
 import (
 	"fmt"
-
-	"github.com/ctx42/xrr/pkg/xrr"
 )
-
-// ErrInvArgType is error returned when command argument slice is not slice of
-// strings.
-var ErrInvArgType = xrr.New("invalid command argument rule usage", "ECInvArgType")
 
 // Rule represents a validation rule.
 type Rule interface {

@@ -44,6 +44,13 @@ var (
 	// ErrInvMeta is returned when command metadata is invalid either
 	// because it is of wrong type, format or value.
 	ErrInvMeta = xrr.New("invalid command metadata key", "ECCmdInvMeta")
+
+	// ErrInvArgType is error returned when command argument slice is not
+	// slice of strings.
+	ErrInvArgType = xrr.New(
+		"invalid command argument rule usage",
+		"ECInvArgType",
+	)
 )
 
 // Marshaler is an interface that provides the ability to marshal an object
