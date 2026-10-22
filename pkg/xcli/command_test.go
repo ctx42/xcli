@@ -218,8 +218,8 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 		assert.NoError(t, root.Run(t.Context(), tst.Ring()))
 		want := "" +
 			"Usage of `root sub`:\n" +
-			"                \n" +
-			"OPTIONS:        \n" +
+			"\n" +
+			"OPTIONS:\n" +
 			"      --help    sub-desc\n"
 		assert.Equal(t, want, tst.Stderr())
 		assert.Empty(t, root.Args())
@@ -758,12 +758,12 @@ func Test_Command_Run(t *testing.T) {
 		want := "" +
 			"Usage of `root sub-b`:\n\n" +
 			"  subcommand B\n" +
-			"                \n" +
-			"OPTIONS:        \n" +
+			"\n" +
+			"OPTIONS:\n" +
 			"  -h, --help    sub-b-help\n" +
 			"      --sb      sb-help\n" +
-			"                \n" +
-			"COMMANDS:       \n" +
+			"\n" +
+			"COMMANDS:\n" +
 			"  sub-b-a       subcommand BA\n"
 		assert.Equal(t, want, tst.Stderr())
 		assert.Empty(t, root.Args())
@@ -797,8 +797,8 @@ func Test_Command_Run(t *testing.T) {
 		want := "" +
 			"Usage of `root sub-b sub-b-a`:\n\n" +
 			"  subcommand BA\n" +
-			"                \n" +
-			"OPTIONS:        \n" +
+			"\n" +
+			"OPTIONS:\n" +
 			"  -h, --help    sub-b-a-help\n" +
 			"      --sba     sba-help\n"
 		assert.Equal(t, want, tst.Stderr())
@@ -955,12 +955,12 @@ func Test_Command_Help(t *testing.T) {
 			"  root --root-def abc    # using long form flag\n" +
 			"  root -r abc            \n" +
 			"  root -r abc            # using short form flag\n" +
-			"                \n" +
-			"OPTIONS:        \n" +
+			"\n" +
+			"OPTIONS:\n" +
 			"  -h, --help    root-help\n" +
 			"  -r, --root    root-help\n" +
-			"                \n" +
-			"COMMANDS:       \n" +
+			"\n" +
+			"COMMANDS:\n" +
 			"  sub-a         subcommand A\n" +
 			"  sub-b         subcommand B\n"
 		assert.Equal(t, want, have)
@@ -977,12 +977,12 @@ func Test_Command_Help(t *testing.T) {
 		want := "" +
 			"Usage of `root sub-b`:\n\n" +
 			"  subcommand B\n" +
-			"                \n" +
-			"OPTIONS:        \n" +
+			"\n" +
+			"OPTIONS:\n" +
 			"  -h, --help    sub-b-help\n" +
 			"      --sb      sb-help\n" +
-			"                \n" +
-			"COMMANDS:       \n" +
+			"\n" +
+			"COMMANDS:\n" +
 			"  sub-b-a       subcommand BA\n"
 		assert.Equal(t, want, have)
 	})

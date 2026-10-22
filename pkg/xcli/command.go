@@ -416,7 +416,8 @@ func (cmd *Command) Help() string {
 	return buf.String()
 }
 
-// help returns command's options and subcommands summary.
+// help returns command's options and subcommands summary, with the padding
+// tabwriter adds at the end of lines removed.
 func (cmd *Command) help() string {
 	buf := &bytes.Buffer{}
 	tw := tabwriter.NewWriter(buf, 0, 8, 4, ' ', 0)
@@ -437,5 +438,9 @@ func (cmd *Command) help() string {
 		_, _ = fmt.Fprintf(tw, "  %s\t%s\n", sub.Name(), sub.shortDesc)
 	}
 	_ = tw.Flush()
-	return buf.String()
+	lines := strings.Split(buf.String(), "\n")
+	for i, line := range lines {
+		lines[i] = strings.TrimRight(line, " ")
+	}
+	return strings.Join(lines, "\n")
 }
