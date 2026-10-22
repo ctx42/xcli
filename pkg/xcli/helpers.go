@@ -88,20 +88,12 @@ func DetectTTY(rng *ring.Ring) *ring.Ring {
 
 // IsStdOutTTY returns true if stdout defined in the ring is a terminal.
 func IsStdOutTTY(rng *ring.Ring) bool {
-	if val := rng.MetaGet(MetaKeySOTerm); val != nil {
-		if is, ok := val.(bool); ok {
-			return is
-		}
-	}
-	return false
+	is, _ := rng.MetaGet(MetaKeySOTerm).(bool)
+	return is
 }
 
 // IsStdErrTTY returns true if stderr defined in the ring is a terminal.
 func IsStdErrTTY(rng *ring.Ring) bool {
-	if val := rng.MetaGet(MetaKeySETerm); val != nil {
-		if is, ok := val.(bool); ok {
-			return is
-		}
-	}
-	return false
+	is, _ := rng.MetaGet(MetaKeySETerm).(bool)
+	return is
 }
