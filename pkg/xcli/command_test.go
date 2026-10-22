@@ -169,6 +169,18 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 		assert.True(t, have)
 	})
 
+	t.Run("true when help flag not defined", func(t *testing.T) {
+		// --- Given ---
+		cmd := NewCommand("root", nil)
+		assert.NoError(t, cmd.Parse("-h"))
+
+		// --- When ---
+		have := cmd.ShouldRunUsage()
+
+		// --- Then ---
+		assert.True(t, have)
+	})
+
 	t.Run("true when parent command help requested", func(t *testing.T) {
 		// --- Given ---
 		ctx := context.Background()
@@ -541,6 +553,20 @@ func Test_Command_Run(t *testing.T) {
 			"  sub-b-a       subcommand BA\n"
 		assert.Equal(t, want, tst.Stderr())
 		assert.Empty(t, root.Args())
+	})
+
+	t.Run("show help when help flag not defined", func(t *testing.T) {
+		// --- Given ---
+		tst := ringtest.New(t).WetStderr()
+		root := NewCommand("root", xclitest.DbgFunc)
+		assert.NoError(t, root.Parse("--help"))
+
+		// --- When ---
+		err := root.Run(t.Context(), tst.Ring())
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, "Usage of `root`:\n", tst.Stderr())
 	})
 
 	t.Run("show help requested before subcommand with required flag", func(t *testing.T) {

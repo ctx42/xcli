@@ -60,6 +60,9 @@ type Command struct {
 	// Usage flag name.
 	usageFlag string
 
+	// Set when parsing met -h or --help with no such flag defined.
+	helpReq bool
+
 	// Short, one line, description.
 	shortDesc string
 
@@ -116,6 +119,9 @@ func (cmd *Command) UsageFlagName(name string) *Command {
 
 // ShouldRunUsage returns true when Usage method should be run.
 func (cmd *Command) ShouldRunUsage() bool {
+	if cmd.helpReq {
+		return true
+	}
 	if cmd.parent != nil && cmd.parent.ShouldRunUsage() {
 		return true
 	}
@@ -173,12 +179,13 @@ func (cmd *Command) Parse(args ...string) error {
 func (cmd *Command) parse(args []string) (*Command, error) {
 	// The `parse` is called to find arguments for the current command up to
 	// the first sub-command name or this command arguments.
-	if err := cmd.hidFlagSet.Parse(args); err != nil {
-		// This happens when there is no formal -h or --help flag defined.
-		// We recognize this in Run method and display help.
-		if !errors.Is(err, flag.ErrHelp) {
-			return nil, err
-		}
+	err := cmd.hidFlagSet.Parse(args)
+
+	// The [flag.ErrHelp] is returned when there is no formal -h or --help
+	// flag defined. We record it, so the Run method displays help.
+	cmd.helpReq = errors.Is(err, flag.ErrHelp)
+	if err != nil && !cmd.helpReq {
+		return nil, err
 	}
 
 	cmd.args = cmd.hidFlagSet.Args()
