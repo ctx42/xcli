@@ -7,7 +7,7 @@ require (
 	github.com/ctx42/ring v0.8.2
 	github.com/ctx42/testing v0.57.1
 	github.com/ctx42/testkit v0.16.3
-	github.com/ctx42/xflag v0.11.2
+	github.com/ctx42/xflag v0.12.0
 	github.com/ctx42/xrr v0.18.3
 	github.com/mattn/go-isatty v0.0.24
 )
