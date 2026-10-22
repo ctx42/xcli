@@ -126,7 +126,11 @@ func TstCmdRequired() *xcli.Command {
 // GenPre returns function matching [xcli.PreRun] signature which when called
 // adds tag with name and value to the [ring.Ring] metadata.
 func GenPre(key string, value int) xcli.PreRun {
-	return func(ctx context.Context, ccx *xcli.CmdCtx) (context.Context, error) {
+	return func(
+		ctx context.Context,
+		ccx *xcli.CmdCtx,
+	) (context.Context, error) {
+
 		ccx.Cmd.MetaSet(key, value)
 		return ctx, nil
 	}

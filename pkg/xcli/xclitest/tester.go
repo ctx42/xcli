@@ -40,7 +40,7 @@ type options struct {
 	env   []string         // Program environment.
 	clock func() time.Time // Function returning current time in UTC.
 	term  bool             // Is the program running on terminal? Default: true.
-	color bool             // May the program use terminal colors? Default: false.
+	color bool             // Terminal colors allowed? Default: false.
 }
 
 type hidRingTester = ringtest.Tester // Hide embedded field.
@@ -91,7 +91,12 @@ func (tst *Tester) WetStderr() *Tester {
 }
 
 // Cmd returns command with the given name, function and arguments.
-func (tst *Tester) Cmd(name string, fn xcli.Func, args ...string) *xcli.Command {
+func (tst *Tester) Cmd(
+	name string,
+	fn xcli.Func,
+	args ...string,
+) *xcli.Command {
+
 	tst.t.Helper()
 	cmd := xcli.NewCommand(name, fn)
 	if err := cmd.Parse(args...); err != nil {

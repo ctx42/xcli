@@ -544,7 +544,7 @@ func Test_Command_PreRun_RunPreRun(t *testing.T) {
 			return nil, ErrTest
 		}
 
-		pre1 := func(ctx context.Context, ccx *CmdCtx) (context.Context, error) {
+		pre1 := func(ctx context.Context, _ *CmdCtx) (context.Context, error) {
 			pre1ran = true
 			return ctx, nil
 		}
