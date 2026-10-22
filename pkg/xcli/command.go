@@ -162,12 +162,13 @@ func (cmd *Command) UsageFlagName(name string) *Command {
 	return cmd
 }
 
-// ShouldRunUsage returns true when Usage method should be run.
-func (cmd *Command) ShouldRunUsage() bool {
+// shouldRunUsage returns true when the help for the command was requested,
+// on the command itself or on any of its ancestors.
+func (cmd *Command) shouldRunUsage() bool {
 	if cmd.helpReq {
 		return true
 	}
-	if cmd.parent != nil && cmd.parent.ShouldRunUsage() {
+	if cmd.parent != nil && cmd.parent.shouldRunUsage() {
 		return true
 	}
 	return cmd.flags.GetBool(cmd.usageFlag)
@@ -311,7 +312,7 @@ func (cmd *Command) run(ctx context.Context, rng *ring.Ring) (err error) {
 	}
 	found := cmd.found
 	ccx := NewCmdCtx(rng, found)
-	if found.ShouldRunUsage() {
+	if found.shouldRunUsage() {
 		if found.flags.Usage != nil {
 			found.flags.Usage()
 			return nil
@@ -386,7 +387,7 @@ func (cmd *Command) IsRoot() bool { return cmd.parent == nil }
 // required flag is not set. If usage (help) flag has been requested it ignores
 // the required flags and returns nil.
 func (cmd *Command) checkRequired() error {
-	if err := cmd.flags.CheckRequired(); err != nil && !cmd.ShouldRunUsage() {
+	if err := cmd.flags.CheckRequired(); err != nil && !cmd.shouldRunUsage() {
 		return fmt.Errorf("%w for command %#q", err, cmd.Name())
 	}
 	if cmd.parent != nil {

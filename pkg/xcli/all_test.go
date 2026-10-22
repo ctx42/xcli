@@ -21,6 +21,9 @@ var (
 // Describe exports the describe method of [Command] for testing.
 func (cmd *Command) Describe() string { return cmd.describe() }
 
+// ShouldRunUsage exports the shouldRunUsage method of [Command] for testing.
+func (cmd *Command) ShouldRunUsage() bool { return cmd.shouldRunUsage() }
+
 // Run exports the run method of [Command] for testing.
 func (cmd *Command) Run(ctx context.Context, rng *ring.Ring) error {
 	return cmd.run(ctx, rng)
