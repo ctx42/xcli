@@ -111,7 +111,7 @@ func (tst *Tester) Cmd(
 // parsed, in which case args are ignored.
 func (tst *Tester) Ctx(cmd *xcli.Command, args ...string) *xcli.CmdCtx {
 	tst.t.Helper()
-	if !cmd.Parsed() {
+	if !cmd.Flags().Parsed() {
 		if err := cmd.Parse(args...); err != nil {
 			tst.t.Error(err)
 			return nil

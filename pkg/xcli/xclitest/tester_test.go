@@ -263,9 +263,9 @@ func Test_Tester_Ctx(t *testing.T) {
 
 		// --- Then ---
 		assert.Same(t, cmd, ccx.Cmd)
-		assert.True(t, cmd.Parsed())
+		assert.True(t, cmd.Flags().Parsed())
 		assert.Equal(t, tst.Ring(), ccx.Rng)
-		assert.False(t, cmd.GetBool("name"))
+		assert.False(t, cmd.Flags().GetBool("name"))
 	})
 
 	t.Run("with args", func(t *testing.T) {
@@ -284,9 +284,9 @@ func Test_Tester_Ctx(t *testing.T) {
 
 		// --- Then ---
 		assert.Same(t, cmd, ccx.Cmd)
-		assert.True(t, cmd.Parsed())
+		assert.True(t, cmd.Flags().Parsed())
 		assert.Equal(t, tst.Ring(), ccx.Rng)
-		assert.True(t, cmd.GetBool("abc"))
+		assert.True(t, cmd.Flags().GetBool("abc"))
 	})
 
 	t.Run("error - parse", func(t *testing.T) {
@@ -307,8 +307,8 @@ func Test_Tester_Ctx(t *testing.T) {
 
 		// --- Then ---
 		assert.Nil(t, ccx)
-		assert.True(t, cmd.Parsed())
-		assert.False(t, cmd.GetBool("name"))
+		assert.True(t, cmd.Flags().Parsed())
+		assert.False(t, cmd.Flags().GetBool("name"))
 	})
 }
 

@@ -15,7 +15,7 @@ import (
 
 func ExampleCommand() {
 	greet := func(_ context.Context, ccx *xcli.CmdCtx) error {
-		name := ccx.Cmd.GetString("name")
+		name := ccx.Cmd.Flags().GetString("name")
 		_, err := fmt.Fprintf(ccx.Rng.Stdout(), "Hello, %s!\n", name)
 		return err
 	}
@@ -23,8 +23,8 @@ func ExampleCommand() {
 	cmd := xcli.NewCommand("hello", greet).
 		ShortDesc("print a greeting").
 		UsageFlagName("help")
-	cmd.BoolSL("help", "h", false, "show help")
-	cmd.StringSL("name", "n", "World", "who to greet")
+	cmd.Flags().BoolSL("help", "h", false, "show help")
+	cmd.Flags().StringSL("name", "n", "World", "who to greet")
 
 	// A program passes os.Args[1:] instead.
 	if err := cmd.Parse("--name", "gopher"); err != nil {
@@ -42,8 +42,8 @@ func ExampleCommand_Help() {
 	cmd := xcli.NewCommand("hello", nil).
 		ShortDesc("print a greeting").
 		UsageFlagName("help")
-	cmd.BoolSL("help", "h", false, "show help")
-	cmd.StringSL("name", "n", "World", "who to greet")
+	cmd.Flags().BoolSL("help", "h", false, "show help")
+	cmd.Flags().StringSL("name", "n", "World", "who to greet")
 
 	// Run prints the same text to standard error on -h or --help.
 	fmt.Print(cmd.Help())
@@ -70,8 +70,8 @@ func ExampleCommand_Add() {
 		Example("todo -f work.txt list", "list tasks in work.txt").
 		UsageFlagName("help").
 		Add(addCmd, listCmd)
-	root.BoolSL("help", "h", false, "show help")
-	root.StringSL("file", "f", "todo.txt", "task list file")
+	root.Flags().BoolSL("help", "h", false, "show help")
+	root.Flags().StringSL("file", "f", "todo.txt", "task list file")
 
 	fmt.Print(root.Help())
 	// Output:
@@ -120,7 +120,7 @@ func ExampleCommand_PreRun() {
 		ccx *xcli.CmdCtx,
 	) (context.Context, error) {
 
-		ccx.Cmd.MetaSet("file", ccx.Cmd.GetString("file"))
+		ccx.Cmd.MetaSet("file", ccx.Cmd.Flags().GetString("file"))
 		return ctx, nil
 	}
 	add := func(_ context.Context, ccx *xcli.CmdCtx) error {
@@ -134,7 +134,7 @@ func ExampleCommand_PreRun() {
 	root := xcli.NewCommand("todo", nil).
 		PreRun(setup).
 		Add(addCmd)
-	root.StringSL("file", "f", "todo.txt", "task list file")
+	root.Flags().StringSL("file", "f", "todo.txt", "task list file")
 
 	if err := root.Parse("-f", "work.txt", "add", "buy", "milk"); err != nil {
 		fmt.Println(err)

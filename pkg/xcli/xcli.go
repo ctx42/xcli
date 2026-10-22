@@ -16,7 +16,7 @@
 //	root := xcli.NewCommand("app", appFunc).
 //		UsageFlagName("help").
 //		Add(sub)
-//	root.BoolSL("help", "h", false, "show help")
+//	root.Flags().BoolSL("help", "h", false, "show help")
 //
 //	if err := root.Parse(os.Args[1:]...); err != nil {
 //		return err

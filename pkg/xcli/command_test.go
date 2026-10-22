@@ -88,6 +88,101 @@ func Test_NewCommand(t *testing.T) {
 	})
 }
 
+func Test_Command_Name(t *testing.T) {
+	// --- Given ---
+	cmd := NewCommand("root", nil)
+
+	// --- When ---
+	have := cmd.Name()
+
+	// --- Then ---
+	assert.Equal(t, "root", have)
+}
+
+func Test_Command_Flags(t *testing.T) {
+	// --- Given ---
+	fs := xflag.NewFlagSet("name", flag.ContinueOnError)
+	cmd := NewCommand("root", nil, WithFlags(fs))
+
+	// --- When ---
+	have := cmd.Flags()
+
+	// --- Then ---
+	assert.Same(t, fs, have)
+}
+
+func Test_Command_MetaLookup(t *testing.T) {
+	t.Run("existing", func(t *testing.T) {
+		// --- Given ---
+		cmd := NewCommand("root", nil).MetaSet("key", 1)
+
+		// --- When ---
+		have, ok := cmd.MetaLookup("key")
+
+		// --- Then ---
+		assert.True(t, ok)
+		assert.Equal(t, 1, have)
+	})
+
+	t.Run("not existing", func(t *testing.T) {
+		// --- Given ---
+		cmd := NewCommand("root", nil)
+
+		// --- When ---
+		have, ok := cmd.MetaLookup("key")
+
+		// --- Then ---
+		assert.False(t, ok)
+		assert.Nil(t, have)
+	})
+}
+
+func Test_Command_MetaGet(t *testing.T) {
+	// --- Given ---
+	cmd := NewCommand("root", nil).MetaSet("key", 1)
+
+	// --- When ---
+	have := cmd.MetaGet("key")
+
+	// --- Then ---
+	assert.Equal(t, 1, have)
+}
+
+func Test_Command_MetaSet(t *testing.T) {
+	// --- Given ---
+	sub := NewCommand("sub", nil)
+	root := NewCommand("root", nil).Add(sub)
+
+	// --- When ---
+	have := sub.MetaSet("key", 1)
+
+	// --- Then ---
+	assert.Same(t, sub, have)
+	assert.Equal(t, map[string]any{"key": 1}, root.MetaAll())
+}
+
+func Test_Command_MetaDelete(t *testing.T) {
+	// --- Given ---
+	cmd := NewCommand("root", nil).MetaSet("key", 1).MetaSet("other", 2)
+
+	// --- When ---
+	cmd.MetaDelete("key")
+
+	// --- Then ---
+	assert.Equal(t, map[string]any{"other": 2}, cmd.MetaAll())
+}
+
+func Test_Command_MetaAll(t *testing.T) {
+	// --- Given ---
+	cmd := NewCommand("root", nil).MetaSet("key", 1)
+
+	// --- When ---
+	have := cmd.MetaAll()
+
+	// --- Then ---
+	assert.Equal(t, map[string]any{"key": 1}, have)
+}
+
 func Test_Command_Add(t *testing.T) {
 	t.Run("add multiple", func(t *testing.T) {
 		// --- Given ---
@@ -133,7 +228,7 @@ func Test_Command_UsageFlagName(t *testing.T) {
 	t.Run("add bool", func(t *testing.T) {
 		// --- Given ---
 		cmd := NewCommand("root", nil)
-		cmd.Bool("help", false, "show help")
+		cmd.Flags().Bool("help", false, "show help")
 
 		// --- When ---
 		have := cmd.UsageFlagName("help")
@@ -141,7 +236,7 @@ func Test_Command_UsageFlagName(t *testing.T) {
 		// --- Then ---
 		assert.Same(t, cmd, have)
 		assert.NoError(t, cmd.Parse("--help"))
-		assert.True(t, cmd.GetBool("help"))
+		assert.True(t, cmd.Flags().GetBool("help"))
 	})
 }
 
@@ -149,7 +244,7 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 	t.Run("true", func(t *testing.T) {
 		// --- Given ---
 		cmd := NewCommand("root", nil).UsageFlagName("help")
-		cmd.Bool("help", false, "show help")
+		cmd.Flags().Bool("help", false, "show help")
 		assert.NoError(t, cmd.Parse("--help"))
 
 		// --- When ---
@@ -162,7 +257,7 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 	t.Run("false", func(t *testing.T) {
 		// --- Given ---
 		cmd := NewCommand("root", nil).UsageFlagName("help")
-		cmd.Bool("help", false, "show help")
+		cmd.Flags().Bool("help", false, "show help")
 
 		// --- When ---
 		have := cmd.ShouldRunUsage()
@@ -174,7 +269,7 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 	t.Run("always true", func(t *testing.T) {
 		// --- Given ---
 		cmd := NewCommand("root", nil).UsageFlagName("help")
-		cmd.Bool("help", true, "show help")
+		cmd.Flags().Bool("help", true, "show help")
 
 		// --- When ---
 		have := cmd.ShouldRunUsage()
@@ -201,12 +296,12 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 
 		sub := NewCommand("sub", xclitest.DbgFunc).
 			UsageFlagName("help")
-		sub.Bool("help", false, "sub-desc")
+		sub.Flags().Bool("help", false, "sub-desc")
 
 		root := NewCommand("root", nil).
 			UsageFlagName("help").
 			Add(sub)
-		root.Bool("help", false, "root-desc")
+		root.Flags().Bool("help", false, "root-desc")
 		assert.NoError(t, root.Parse("--help", "sub"))
 
 		// --- When ---
@@ -304,7 +399,7 @@ func Test_Command_ArgsRule(t *testing.T) {
 func Test_Command_Args(t *testing.T) {
 	// --- Given ---
 	cmd := NewCommand("cmd", nil).ArgsRule(MinArgsRule(0))
-	cmd.Bool("flag", false, "usage")
+	cmd.Flags().Bool("flag", false, "usage")
 	assert.NoError(t, cmd.Parse("--flag", "arg0", "arg1"))
 
 	// --- When ---
@@ -318,7 +413,7 @@ func Test_Command_Parse(t *testing.T) {
 	t.Run("parse flags", func(t *testing.T) {
 		// --- Given ---
 		cmd := xclitest.TstCmd()
-		cmd.String("str", "abc", "usage")
+		cmd.Flags().String("str", "abc", "usage")
 
 		// --- When ---
 		err := cmd.Parse("--root", "abc", "--str", "xyz")
@@ -362,7 +457,7 @@ func Test_Command_Parse(t *testing.T) {
 	t.Run("optional string flag", func(t *testing.T) {
 		// --- Given ---
 		cmd := xclitest.TstCmd()
-		cmd.String("str", "abc", "usage")
+		cmd.Flags().String("str", "abc", "usage")
 
 		// --- When ---
 		err := cmd.Parse()
@@ -732,7 +827,7 @@ func Test_Command_Run(t *testing.T) {
 		tst := ringtest.New(t)
 		var usageRan bool
 		root := xclitest.TstCmd()
-		root.Usage = func() { usageRan = true }
+		root.Flags().Usage = func() { usageRan = true }
 		assert.NoError(t, root.Parse("--help"))
 
 		// --- When ---
@@ -850,17 +945,17 @@ func Test_Command_Run(t *testing.T) {
 func Test_Command_GetFlagSet(t *testing.T) {
 	// --- Given ---
 	subA := NewCommand("sub-a", xclitest.DbgFunc)
-	subA.Int("sa", 42, "sa-desc")
+	subA.Flags().Int("sa", 42, "sa-desc")
 
 	subB := NewCommand("sub-b", xclitest.DbgFunc)
-	subB.String("sb", "sb-def", "sb-desc")
+	subB.Flags().String("sb", "sb-def", "sb-desc")
 
 	subBA := NewCommand("sub-b-a", xclitest.DbgFunc)
-	subBA.String("sba", "sba-def", "sba-desc")
+	subBA.Flags().String("sba", "sba-def", "sba-desc")
 	subB.Add(subBA)
 
 	root := NewCommand("root", xclitest.DbgFunc).Add(subA, subB)
-	root.String("root", "root-def", "root-desc")
+	root.Flags().String("root", "root-def", "root-desc")
 
 	t.Run("get default value of existing", func(t *testing.T) {
 		// --- When ---

@@ -56,7 +56,7 @@ A single command with a help flag and a `--name` flag:
 <!-- gmmce:pkg/xcli/ExampleCommand -->
 ```go
 greet := func(_ context.Context, ccx *xcli.CmdCtx) error {
-	name := ccx.Cmd.GetString("name")
+	name := ccx.Cmd.Flags().GetString("name")
 	_, err := fmt.Fprintf(ccx.Rng.Stdout(), "Hello, %s!\n", name)
 	return err
 }
@@ -64,8 +64,8 @@ greet := func(_ context.Context, ccx *xcli.CmdCtx) error {
 cmd := xcli.NewCommand("hello", greet).
 	ShortDesc("print a greeting").
 	UsageFlagName("help")
-cmd.BoolSL("help", "h", false, "show help")
-cmd.StringSL("name", "n", "World", "who to greet")
+cmd.Flags().BoolSL("help", "h", false, "show help")
+cmd.Flags().StringSL("name", "n", "World", "who to greet")
 
 // A program passes os.Args[1:] instead.
 if err := cmd.Parse("--name", "gopher"); err != nil {
@@ -88,8 +88,8 @@ running the command function. The same text comes from `Help`:
 cmd := xcli.NewCommand("hello", nil).
 	ShortDesc("print a greeting").
 	UsageFlagName("help")
-cmd.BoolSL("help", "h", false, "show help")
-cmd.StringSL("name", "n", "World", "who to greet")
+cmd.Flags().BoolSL("help", "h", false, "show help")
+cmd.Flags().StringSL("name", "n", "World", "who to greet")
 
 // Run prints the same text to standard error on -h or --help.
 fmt.Print(cmd.Help())
@@ -123,8 +123,8 @@ root := xcli.NewCommand("todo", nil).
 	Example("todo -f work.txt list", "list tasks in work.txt").
 	UsageFlagName("help").
 	Add(addCmd, listCmd)
-root.BoolSL("help", "h", false, "show help")
-root.StringSL("file", "f", "todo.txt", "task list file")
+root.Flags().BoolSL("help", "h", false, "show help")
+root.Flags().StringSL("file", "f", "todo.txt", "task list file")
 
 fmt.Print(root.Help())
 // Output:
@@ -190,7 +190,7 @@ setup := func(
 	ccx *xcli.CmdCtx,
 ) (context.Context, error) {
 
-	ccx.Cmd.MetaSet("file", ccx.Cmd.GetString("file"))
+	ccx.Cmd.MetaSet("file", ccx.Cmd.Flags().GetString("file"))
 	return ctx, nil
 }
 add := func(_ context.Context, ccx *xcli.CmdCtx) error {
@@ -204,7 +204,7 @@ addCmd := xcli.NewCommand("add", add).ArgsRule(xcli.MinArgsRule(1))
 root := xcli.NewCommand("todo", nil).
 	PreRun(setup).
 	Add(addCmd)
-root.StringSL("file", "f", "todo.txt", "task list file")
+root.Flags().StringSL("file", "f", "todo.txt", "task list file")
 
 if err := root.Parse("-f", "work.txt", "add", "buy", "milk"); err != nil {
 	fmt.Println(err)
@@ -246,7 +246,7 @@ quickstart function declared at package level:
 func Test_greet(t *testing.T) {
 	tst := xclitest.New(t).WetStdout()
 	cmd := xcli.NewCommand("hello", greet)
-	cmd.StringSL("name", "n", "World", "who to greet")
+	cmd.Flags().StringSL("name", "n", "World", "who to greet")
 	ccx := tst.Ctx(cmd, "--name", "gopher")
 
 	err := greet(t.Context(), ccx)

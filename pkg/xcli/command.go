@@ -30,21 +30,18 @@ type PreRun func(ctx context.Context, ccx *CmdCtx) (context.Context, error)
 // output (standard error when not set) instead of the [ring.Ring] streams.
 // Set Usage to nil to have [Command.Run] print [Command.Help] instead.
 func WithFlags(fs *xflag.FlagSet) func(*Command) {
-	return func(cmd *Command) { cmd.hidFlagSet = fs }
+	return func(cmd *Command) { cmd.flags = fs }
 }
-
-// Do not export embedded.
-type (
-	hidMeta    = Meta
-	hidFlagSet = xflag.FlagSet
-)
 
 // Command represents CLI command and its sub-commands.
 //
 // The zero value is not usable. Use [NewCommand] to create a command.
 type Command struct {
-	hidMeta     // Metadata.
-	*hidFlagSet // Flags.
+	// Metadata shared by all commands in the tree.
+	meta Meta
+
+	// Command flags.
+	flags *xflag.FlagSet
 
 	// Parent command (nil for root command).
 	parent *Command
@@ -86,29 +83,62 @@ type Command struct {
 // NewCommand instantiates new command.
 func NewCommand(name string, fn Func, opts ...func(*Command)) *Command {
 	cmd := &Command{
-		hidMeta:  NewMeta(),
+		meta:     NewMeta(),
 		argsRule: ArgsRule(0),
 		fn:       fn,
 	}
 	for _, opt := range opts {
 		opt(cmd)
 	}
-	if cmd.hidFlagSet == nil {
-		cmd.hidFlagSet = xflag.NewFlagSet(name, flag.ContinueOnError)
-		cmd.Usage = nil
-		cmd.SetOutput(io.Discard)
+	if cmd.flags == nil {
+		cmd.flags = xflag.NewFlagSet(name, flag.ContinueOnError)
+		cmd.flags.Usage = nil
+		cmd.flags.SetOutput(io.Discard)
 	} else {
 		// The flag set must have command's name.
-		cmd.hidFlagSet.Init(name, cmd.hidFlagSet.ErrorHandling())
+		cmd.flags.Init(name, cmd.flags.ErrorHandling())
 	}
 	return cmd
 }
+
+// Name returns the command name.
+func (cmd *Command) Name() string { return cmd.flags.Name() }
+
+// Flags returns the command flag set.
+func (cmd *Command) Flags() *xflag.FlagSet { return cmd.flags }
+
+// MetaLookup returns the value of the metadata variable named by the key and
+// true, or nil and false when the variable is not set. The metadata is shared
+// by all commands in the tree.
+func (cmd *Command) MetaLookup(key string) (any, bool) {
+	return cmd.meta.MetaLookup(key)
+}
+
+// MetaGet returns the value of the metadata variable named by the key, or nil
+// when the variable is not set. The metadata is shared by all commands in the
+// tree.
+func (cmd *Command) MetaGet(key string) any { return cmd.meta.MetaGet(key) }
+
+// MetaSet sets the value of the metadata variable named by the key. The
+// metadata is shared by all commands in the tree.
+func (cmd *Command) MetaSet(key string, value any) *Command {
+	cmd.meta.MetaSet(key, value)
+	return cmd
+}
+
+// MetaDelete deletes the metadata variable named by the key. The metadata is
+// shared by all commands in the tree.
+func (cmd *Command) MetaDelete(key string) { cmd.meta.MetaDelete(key) }
+
+// MetaAll returns the map backing the metadata shared by all commands in the
+// tree.
+func (cmd *Command) MetaAll() map[string]any { return cmd.meta.MetaAll() }
 
 // Add adds subcommand(s) to the current command.
 func (cmd *Command) Add(cs ...*Command) *Command {
 	for _, c := range cs {
 		c.parent = cmd
-		c.setMeta(cmd.hidMeta)
+		c.setMeta(cmd.meta)
 		cmd.subs = append(cmd.subs, c)
 	}
 	return cmd
@@ -117,7 +147,7 @@ func (cmd *Command) Add(cs ...*Command) *Command {
 // setMeta sets the metadata collection on the command and all its
 // subcommands at every depth.
 func (cmd *Command) setMeta(meta Meta) {
-	cmd.hidMeta = meta
+	cmd.meta = meta
 	for _, sub := range cmd.subs {
 		sub.setMeta(meta)
 	}
@@ -137,7 +167,7 @@ func (cmd *Command) ShouldRunUsage() bool {
 	if cmd.parent != nil && cmd.parent.ShouldRunUsage() {
 		return true
 	}
-	return cmd.GetBool(cmd.usageFlag)
+	return cmd.flags.GetBool(cmd.usageFlag)
 }
 
 // ShortDesc sets short description for the command.
@@ -195,7 +225,7 @@ func (cmd *Command) Parse(args ...string) error {
 func (cmd *Command) parse(args []string) (*Command, error) {
 	// The `parse` is called to find arguments for the current command up to
 	// the first sub-command name or this command arguments.
-	err := cmd.hidFlagSet.Parse(args)
+	err := cmd.flags.Parse(args)
 
 	// The [flag.ErrHelp] is returned when there is no formal -h or --help
 	// flag defined. We record it, so the Run method displays help.
@@ -204,7 +234,7 @@ func (cmd *Command) parse(args []string) (*Command, error) {
 		return nil, err
 	}
 
-	cmd.args = cmd.hidFlagSet.Args()
+	cmd.args = cmd.flags.Args()
 	if len(cmd.args) == 0 {
 		// The `parse` is called to find and parse the flags
 		// for the next command, if there are no more arguments
@@ -261,14 +291,14 @@ func (cmd *Command) PreRun(fns ...PreRun) *Command {
 // Run runs either found or this command. If pre-run functions were defined,
 // they will be run in the order from root command to the found one.
 func (cmd *Command) Run(ctx context.Context, rng *ring.Ring) (err error) {
-	if cmd.found == nil || !cmd.Parsed() {
+	if cmd.found == nil || !cmd.flags.Parsed() {
 		return errors.New("not parsed arguments")
 	}
 	found := cmd.found
 	ccx := NewCmdCtx(rng, found)
 	if found.ShouldRunUsage() {
-		if found.Usage != nil {
-			found.Usage()
+		if found.flags.Usage != nil {
+			found.flags.Usage()
 			return nil
 		}
 		_, _ = fmt.Fprint(rng.Stderr(), found.Help())
@@ -321,12 +351,12 @@ func RunPreRun(ctx context.Context, ccx *CmdCtx) (context.Context, error) {
 // calls.
 func (cmd *Command) GetFlagSet(name string) *xflag.FlagSet {
 	if cmd.Name() == name {
-		return cmd.hidFlagSet
+		return cmd.flags
 	}
 	if cmd.parent == nil {
-		fs := xflag.NewFlagSet(name, cmd.hidFlagSet.ErrorHandling())
+		fs := xflag.NewFlagSet(name, cmd.flags.ErrorHandling())
 		fs.Usage = nil
-		fs.SetOutput(cmd.FlagSet.Output())
+		fs.SetOutput(cmd.flags.Output())
 		return fs
 	}
 	return cmd.parent.GetFlagSet(name)
@@ -341,7 +371,7 @@ func (cmd *Command) IsRoot() bool { return cmd.parent == nil }
 // required flag is not set. If usage (help) flag has been requested it ignores
 // the required flags and returns nil.
 func (cmd *Command) checkRequired() error {
-	if err := cmd.CheckRequired(); err != nil && !cmd.ShouldRunUsage() {
+	if err := cmd.flags.CheckRequired(); err != nil && !cmd.ShouldRunUsage() {
 		return fmt.Errorf("%w for command %#q", err, cmd.Name())
 	}
 	if cmd.parent != nil {
@@ -367,7 +397,7 @@ func (cmd *Command) desc(padding int, buf *strings.Builder) {
 		found = fmt.Sprintf("(%s)", cmd.found.Name())
 	}
 	_, _ = fmt.Fprintf(buf, "%scmd%s: %s", pad, found, cmd.Name())
-	cmd.VisitAll(func(flg *flag.Flag) {
+	cmd.flags.VisitAll(func(flg *flag.Flag) {
 		_, _ = fmt.Fprintf(buf, " --%s %v", flg.Name, flg.Value)
 	})
 	_, _ = buf.WriteString("\n")
@@ -425,7 +455,7 @@ func (cmd *Command) Help() string {
 func (cmd *Command) help() string {
 	buf := &bytes.Buffer{}
 	tw := tabwriter.NewWriter(buf, 0, 8, 4, ' ', 0)
-	opts := cmd.HelpOptionLines()
+	opts := cmd.flags.HelpOptionLines()
 	if len(opts) > 0 {
 		_, _ = fmt.Fprintf(tw, "\t\n")
 		_, _ = fmt.Fprintf(tw, "OPTIONS:\t\n")

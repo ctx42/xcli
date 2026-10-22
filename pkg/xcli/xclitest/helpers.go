@@ -39,17 +39,17 @@ func NopFunc(_ context.Context, _ *xcli.CmdCtx) error { return nil }
 func TstCmd() *xcli.Command {
 	// Defines usage flag and its alias.
 	helpFlg := func(cmd *xcli.Command, usage string) {
-		cmd.BoolSL("help", "h", false, usage)
+		cmd.Flags().BoolSL("help", "h", false, usage)
 	}
 
 	subA := xcli.NewCommand("sub-a", DbgFunc).
 		ShortDesc("subcommand A").
 		ArgsRule(xcli.ArgsRule(0))
-	subA.Int("sa", 42, "sa-help")
+	subA.Flags().Int("sa", 42, "sa-help")
 
 	subBA := xcli.NewCommand("sub-b-a", DbgFunc).
 		ShortDesc("subcommand BA")
-	subBA.String("sba", "sba-def", "sba-help")
+	subBA.Flags().String("sba", "sba-def", "sba-help")
 	helpFlg(subBA, "sub-b-a-help")
 
 	subB := xcli.NewCommand("sub-b", DbgFunc).
@@ -58,7 +58,7 @@ func TstCmd() *xcli.Command {
 		UsageFlagName("help").
 		Add(subBA)
 	helpFlg(subB, "sub-b-help")
-	subB.String("sb", "sb-def", "sb-help")
+	subB.Flags().String("sb", "sb-def", "sb-help")
 
 	root := xcli.NewCommand("root", DbgFunc).
 		ShortDesc("main command").
@@ -69,7 +69,7 @@ func TstCmd() *xcli.Command {
 		UsageFlagName("help").
 		Add(subA, subB)
 	helpFlg(root, "root-help")
-	root.StringSL("root", "r", "root-def", "root-help")
+	root.Flags().StringSL("root", "r", "root-def", "root-help")
 
 	return root
 }
@@ -92,7 +92,7 @@ func TstCmd() *xcli.Command {
 func TstCmdRequired() *xcli.Command {
 	// Defines usage flag and its alias.
 	helpFlg := func(cmd *xcli.Command, usage string) {
-		cmd.BoolSL("help", "h", false, usage)
+		cmd.Flags().BoolSL("help", "h", false, usage)
 	}
 
 	subA := xcli.NewCommand("sub-a", DbgFunc).
@@ -105,7 +105,7 @@ func TstCmdRequired() *xcli.Command {
 		ShortDesc("subcommand BA").
 		ArgsRule(xcli.ArgsRule(0)).
 		UsageFlagName("help")
-	subBA.String("sba", "sba-def", "sba-help")
+	subBA.Flags().String("sba", "sba-def", "sba-help")
 	helpFlg(subBA, "sub-b-a-help")
 
 	subB := xcli.NewCommand("sub-b", DbgFunc).
@@ -114,8 +114,8 @@ func TstCmdRequired() *xcli.Command {
 		UsageFlagName("help").
 		Add(subBA)
 	helpFlg(subB, "sub-b-help")
-	subB.String("sb", "", "sb-help")
-	subB.Required("sb")
+	subB.Flags().String("sb", "", "sb-help")
+	subB.Flags().Required("sb")
 
 	root := xcli.NewCommand("root", DbgFunc).
 		Add(subA, subB)
