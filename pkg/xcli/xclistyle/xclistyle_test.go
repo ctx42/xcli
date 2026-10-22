@@ -1,7 +1,7 @@
 // SPDX-FileCopyrightText: (c) 2026 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
-package xcli_test
+package xclistyle
 
 import (
 	"bytes"
@@ -9,13 +9,11 @@ import (
 
 	"github.com/charmbracelet/lipgloss"
 	"github.com/ctx42/testing/pkg/assert"
-
-	. "github.com/ctx42/xcli/pkg/xcli"
 )
 
-func Test_NewStyle(t *testing.T) {
+func Test_New(t *testing.T) {
 	// --- When ---
-	have := NewStyle(&bytes.Buffer{})
+	have := New(&bytes.Buffer{})
 
 	// --- Then ---
 	assert.False(t, have.Base.GetBold())

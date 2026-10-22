@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: (c) 2026 Rafal Zajac
 // SPDX-License-Identifier: MIT
 
-package xcli
+// Package xclistyle provides predefined lipgloss styles for command line
+// program output.
+package xclistyle
 
 import (
 	"io"
@@ -17,8 +19,8 @@ type Style struct {
 	Error   lipgloss.Style // Bold red.
 }
 
-// NewStyle returns new CLI styles based on output buffer.
-func NewStyle(out io.Writer) Style {
+// New returns new CLI styles rendered for the given output.
+func New(out io.Writer) Style {
 	base := lipgloss.NewRenderer(out).NewStyle()
 	sty := Style{Base: base}
 	sty.Header = base.
