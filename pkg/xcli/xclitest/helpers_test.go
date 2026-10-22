@@ -28,8 +28,7 @@ func Test_DbgFunc(t *testing.T) {
 	// --- Then ---
 	assert.NoError(t, err)
 	assert.False(t, called)
-	want := "command `name` with args [arg0 arg1]"
-	assert.Equal(t, want, tst.Stdout())
+	assert.Equal(t, "command `name` with args [arg0 arg1]", tst.Stdout())
 }
 
 func Test_NopFunc(t *testing.T) {

@@ -597,8 +597,7 @@ func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
 
 		// --- Then ---
 		assert.NoError(t, err)
-		want := "dbg-pre: my: 1\n root: 1\n sub-a-a: 1\n"
-		assert.Equal(t, want, tst.Stderr())
+		assert.Equal(t, "dbg-pre: my: 1\n root: 1\n sub-a-a: 1\n", tst.Stderr())
 		assert.Empty(t, root.Args())
 	})
 
@@ -810,8 +809,7 @@ func Test_Command_Run(t *testing.T) {
 		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
-		want := "not parsed arguments"
-		assert.ErrorEqual(t, want, err)
+		assert.ErrorEqual(t, "not parsed arguments", err)
 	})
 }
 
@@ -962,8 +960,7 @@ func Test_Command_Help(t *testing.T) {
 		have := cmd.Help()
 
 		// --- Then ---
-		want := "Usage of `cmd`:\n"
-		assert.Equal(t, want, have)
+		assert.Equal(t, "Usage of `cmd`:\n", have)
 	})
 
 	t.Run("with short description", func(t *testing.T) {
@@ -974,8 +971,7 @@ func Test_Command_Help(t *testing.T) {
 		have := cmd.Help()
 
 		// --- Then ---
-		want := "Usage of `cmd`:\n\n  short desc\n"
-		assert.Equal(t, want, have)
+		assert.Equal(t, "Usage of `cmd`:\n\n  short desc\n", have)
 	})
 
 	t.Run("with example", func(t *testing.T) {
@@ -1000,7 +996,6 @@ func Test_Command_Help(t *testing.T) {
 		have := cmd.Help()
 
 		// --- Then ---
-		want := "Usage of `cmd`:\n\n  long desc\n"
-		assert.Equal(t, want, have)
+		assert.Equal(t, "Usage of `cmd`:\n\n  long desc\n", have)
 	})
 }
