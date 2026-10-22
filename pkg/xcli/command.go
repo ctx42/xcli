@@ -159,8 +159,12 @@ func (cmd *Command) Example(eg, desc string) *Command {
 	return cmd
 }
 
-// ArgsRule sets argument count rules.
+// ArgsRule sets argument count rules. A nil rule sets the default rule
+// requiring no arguments.
 func (cmd *Command) ArgsRule(rule Rule) *Command {
+	if rule == nil {
+		rule = ArgsRule(0)
+	}
 	cmd.argsRule = rule
 	return cmd
 }

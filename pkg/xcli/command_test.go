@@ -271,18 +271,34 @@ func Test_Command_Example(t *testing.T) {
 }
 
 func Test_Command_ArgsRule(t *testing.T) {
-	// --- Given ---
-	tst := xclitest.New(t)
-	cmd := tst.Cmd("root", xclitest.NopFunc, "arg0", "arg1")
-	cmd.ArgsRule(MinArgsRule(3))
+	t.Run("set", func(t *testing.T) {
+		// --- Given ---
+		tst := xclitest.New(t)
+		cmd := tst.Cmd("root", xclitest.NopFunc, "arg0", "arg1")
+		cmd.ArgsRule(MinArgsRule(3))
 
-	// --- When ---
-	err := cmd.Run(t.Context(), tst.Ring())
+		// --- When ---
+		err := cmd.Run(t.Context(), tst.Ring())
 
-	// --- Then ---
-	want := "command `root` requires minimum 3 arguments 2 given"
-	assert.ErrorEqual(t, want, err)
-	assert.Equal(t, []string{"arg0", "arg1"}, cmd.Args())
+		// --- Then ---
+		want := "command `root` requires minimum 3 arguments 2 given"
+		assert.ErrorEqual(t, want, err)
+		assert.Equal(t, []string{"arg0", "arg1"}, cmd.Args())
+	})
+
+	t.Run("nil sets the default", func(t *testing.T) {
+		// --- Given ---
+		tst := xclitest.New(t)
+		cmd := tst.Cmd("root", xclitest.NopFunc, "arg0")
+		cmd.ArgsRule(nil)
+
+		// --- When ---
+		err := cmd.Run(t.Context(), tst.Ring())
+
+		// --- Then ---
+		want := "command `root` requires no arguments 1 given"
+		assert.ErrorEqual(t, want, err)
+	})
 }
 
 func Test_Command_Args(t *testing.T) {
