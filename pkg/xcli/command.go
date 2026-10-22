@@ -40,6 +40,8 @@ type (
 )
 
 // Command represents CLI command and its sub-commands.
+//
+// The zero value is not usable. Use [NewCommand] to create a command.
 type Command struct {
 	hidMeta     // Metadata.
 	*hidFlagSet // Flags.

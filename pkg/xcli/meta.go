@@ -4,6 +4,9 @@
 package xcli
 
 // Meta represents metadata collection.
+//
+// The zero value is read-only: [Meta.MetaSet] panics on it. Use [NewMeta] to
+// create a collection.
 type Meta struct {
 	m map[string]any
 }
