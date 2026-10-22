@@ -19,7 +19,8 @@ import (
 
 // PreRun is the signature of functions run before a command. It takes the
 // context and the command context, and returns a potentially modified context
-// and an error. The caller must use the returned context.
+// and an error. The caller must use the returned context; a nil context
+// leaves the context unchanged.
 //
 // During a hook, ccx.Cmd is the command the hook was registered on, which is
 // the selected command or one of its ancestors. Metadata is shared by the
@@ -370,8 +371,12 @@ func runPreRun(ctx context.Context, ccx *CmdCtx) (context.Context, error) {
 		}
 	}
 	for _, pre := range ccx.Cmd.pre {
-		if ctx, err = pre(ctx, ccx); err != nil {
+		var next context.Context
+		if next, err = pre(ctx, ccx); err != nil {
 			return nil, err
+		}
+		if next != nil {
+			ctx = next
 		}
 	}
 	return ctx, nil

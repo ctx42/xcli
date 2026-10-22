@@ -744,6 +744,23 @@ func Test_Command_PreRun_RunPreRun(t *testing.T) {
 		assert.Same(t, cmd, have)
 	})
 
+	t.Run("nil context keeps the previous one", func(t *testing.T) {
+		// --- Given ---
+		ctx := t.Context()
+		pre := func(context.Context, *CmdCtx) (context.Context, error) {
+			return nil, nil
+		}
+		cmd, ccx := xclitest.New(t).CmdAndCtx("root", nil)
+		cmd.PreRun(pre)
+
+		// --- When ---
+		have, err := RunPreRun(ctx, ccx)
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Same(t, ctx, have)
+	})
+
 	t.Run("error - pre run", func(t *testing.T) {
 		// --- Given ---
 		pre := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
