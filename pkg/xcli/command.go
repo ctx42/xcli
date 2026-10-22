@@ -140,10 +140,17 @@ func (cmd *Command) MetaDelete(key string) { delete(cmd.meta, key) }
 // tree.
 func (cmd *Command) MetaAll() map[string]any { return cmd.meta }
 
-// Add adds subcommand(s) to the current command.
+// Add adds subcommand(s) to the current command. The subcommands share the
+// metadata of the command from now on; metadata they already hold is kept,
+// except for keys the command already has.
 func (cmd *Command) Add(cs ...*Command) *Command {
 	for _, c := range cs {
 		c.parent = cmd
+		for key, val := range c.meta {
+			if _, ok := cmd.meta[key]; !ok {
+				cmd.meta[key] = val
+			}
+		}
 		c.setMeta(cmd.meta)
 		cmd.subs = append(cmd.subs, c)
 	}

@@ -223,6 +223,25 @@ func Test_Command_Add(t *testing.T) {
 		assert.Same(t, root.MetaAll(), sba.MetaAll())
 		assert.Same(t, root.MetaAll(), sbaa.MetaAll())
 	})
+
+	t.Run("keep subcommand metadata", func(t *testing.T) {
+		// --- Given ---
+		root := NewCommand("root", nil).MetaSet("shared", "root")
+		sbaa := NewCommand("sub-b-a-a", nil).MetaSet("deep", 3)
+		sba := NewCommand("sub-b-a", nil).Add(sbaa)
+		sb := NewCommand("sub-b", nil).
+			MetaSet("sub", 1).
+			MetaSet("shared", "sub").
+			Add(sba)
+
+		// --- When ---
+		root.Add(sb)
+
+		// --- Then ---
+		want := map[string]any{"shared": "root", "sub": 1, "deep": 3}
+		assert.Equal(t, want, root.MetaAll())
+		assert.Same(t, root.MetaAll(), sbaa.MetaAll())
+	})
 }
 
 func Test_Command_UsageFlagName(t *testing.T) {
