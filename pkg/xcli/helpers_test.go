@@ -33,50 +33,50 @@ func Test_defaultFunc(t *testing.T) {
 }
 
 func Test_Marshal(t *testing.T) {
-	t.Run("success", func(t *testing.T) {
-		tt := []struct {
-			testN string
-
-			v    any
-			want string
-		}{
-			{"error", errors.New("msg"), "msg"},
-			{"Marshaler", TMarshaler("test"), "test"},
-			{
-				"TextMarshaler",
-				time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC),
-				"2026-01-02T03:04:05Z",
-			},
-			{"Stringer", time.Second, "1s"},
-			{"string", "abc", "abc"},
-			{"bytes", []byte("abc"), "abc"},
-			{"int", 42, "42"},
-			{"nil", nil, "<nil>"},
-		}
-
-		for _, tc := range tt {
-			t.Run(tc.testN, func(t *testing.T) {
-				// --- When ---
-				have, err := Marshal(tc.v)
-
-				// --- Then ---
-				assert.NoError(t, err)
-				assert.Equal(t, tc.want, string(have))
-			})
-		}
-	})
-
 	t.Run("error - marshaler", func(t *testing.T) {
 		// --- Given ---
 		v := TErrMarshaler("test")
 
 		// --- When ---
-		data, err := Marshal(v)
+		have, err := Marshal(v)
 
 		// --- Then ---
 		assert.ErrorEqual(t, "test", err)
-		assert.Nil(t, data)
+		assert.Nil(t, have)
 	})
+}
+
+func Test_Marshal_tabular(t *testing.T) {
+	tt := []struct {
+		testN string
+
+		v    any
+		want string
+	}{
+		{"error", errors.New("msg"), "msg"},
+		{"Marshaler", TMarshaler("test"), "test"},
+		{
+			"TextMarshaler",
+			time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC),
+			"2026-01-02T03:04:05Z",
+		},
+		{"Stringer", time.Second, "1s"},
+		{"string", "abc", "abc"},
+		{"bytes", []byte("abc"), "abc"},
+		{"int", 42, "42"},
+		{"nil", nil, "<nil>"},
+	}
+
+	for _, tc := range tt {
+		t.Run(tc.testN, func(t *testing.T) {
+			// --- When ---
+			have, err := Marshal(tc.v)
+
+			// --- Then ---
+			assert.NoError(t, err)
+			assert.Equal(t, tc.want, string(have))
+		})
+	}
 }
 
 func Test_RunCmd(t *testing.T) {

@@ -380,7 +380,7 @@ func Test_Command_Find(t *testing.T) {
 	})
 }
 
-func Test_Parse(t *testing.T) {
+func Test_Command_Parse(t *testing.T) {
 	t.Run("parse flags", func(t *testing.T) {
 		// --- Given ---
 		cmd := xclitest.TstCmd()
