@@ -322,7 +322,6 @@ func Test_Tester_CmdAndCtx(t *testing.T) {
 		assert.Same(t, cmd, ccx.Cmd)
 		assert.Equal(t, "name", ccx.Cmd.Name())
 		assert.Equal(t, []string{"a", "b", "c"}, ccx.Cmd.Args())
-
 		assert.Same(t, tst.Streams().Stdin(), ccx.Rng.Stdin())
 		assert.Same(t, tst.Streams().Stdout(), ccx.Rng.Stdout())
 		assert.Same(t, tst.Streams().Stderr(), ccx.Rng.Stderr())
@@ -363,6 +362,7 @@ func Test_Tester_Func(t *testing.T) {
 
 	// --- Then ---
 	assert.NotNil(t, fn)
+
 	assert.NoError(t, fn(t.Context(), cmx))
 	assert.Equal(t, "command `name` with args [a b c]", tst.Stdout())
 }
@@ -381,6 +381,7 @@ func Test_Tester_NopFunc(t *testing.T) {
 
 	// --- Then ---
 	assert.NotNil(t, fn)
+
 	assert.NoError(t, fn(t.Context(), cmx))
 	assert.Equal(t, "", tst.Stderr())
 }

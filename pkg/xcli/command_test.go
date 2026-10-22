@@ -40,6 +40,7 @@ func Test_NewCommand(t *testing.T) {
 
 		// --- Then ---
 		assert.NoError(t, cmd.Parse())
+
 		assert.NoError(t, cmd.Run(t.Context(), tst.Ring()))
 		assert.Equal(t, "command `root` with args []", tst.Stdout())
 	})
@@ -213,8 +214,8 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 
 		// --- Then ---
 		assert.True(t, have)
-		assert.NoError(t, root.Run(t.Context(), tst.Ring()))
 
+		assert.NoError(t, root.Run(t.Context(), tst.Ring()))
 		want := "" +
 			"Usage of `root sub`:\n" +
 			"                \n" +
@@ -709,11 +710,10 @@ func Test_Command_Run(t *testing.T) {
 	t.Run("run usage", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
-		root := xclitest.TstCmd()
-		assert.NoError(t, root.Parse("--help"))
-
 		var usageRan bool
+		root := xclitest.TstCmd()
 		root.Usage = func() { usageRan = true }
+		assert.NoError(t, root.Parse("--help"))
 
 		// --- When ---
 		err := root.Run(t.Context(), tst.Ring())
