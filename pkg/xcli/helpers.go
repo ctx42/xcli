@@ -25,8 +25,8 @@ func defaultFunc(_ context.Context, ccx *CmdCtx) error {
 // Marshal marshals v to a byte slice suitable for display on the CLI.
 //
 // It uses the [Marshaler] or [encoding.TextMarshaler] implementation of v, in
-// that order. Otherwise, a byte slice of any named type is returned as text
-// and any other value is formatted with the %v verb.
+// that order. Otherwise, a byte slice, including one of a named type, is
+// returned as text and any other value is formatted with the %v verb.
 func Marshal(v any) ([]byte, error) {
 	switch val := v.(type) {
 	case Marshaler:
