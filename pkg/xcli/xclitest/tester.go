@@ -114,6 +114,7 @@ func (tst *Tester) Ctx(cmd *xcli.Command, args ...string) *xcli.CmdCtx {
 }
 
 // CmdAndCtx returns a command and command context based on [Tester] fields.
+// It returns nils when parsing the arguments fails.
 func (tst *Tester) CmdAndCtx(
 	name string,
 	fn xcli.Func,
@@ -122,6 +123,9 @@ func (tst *Tester) CmdAndCtx(
 
 	tst.t.Helper()
 	cmd := tst.Cmd(name, fn, args...)
+	if cmd == nil {
+		return nil, nil
+	}
 	ccx := xcli.NewCmdCtx(tst.Ring(), cmd)
 	return cmd, ccx
 }

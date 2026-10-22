@@ -289,26 +289,46 @@ func Test_Tester_Ctx(t *testing.T) {
 }
 
 func Test_Tester_CmdAndCtx(t *testing.T) {
-	// --- Given ---
-	tspy := tester.New(t)
-	tspy.ExpectCleanups(2)
-	tspy.Close()
+	t.Run("success", func(t *testing.T) {
+		// --- Given ---
+		tspy := tester.New(t)
+		tspy.ExpectCleanups(2)
+		tspy.Close()
 
-	tst := New(tspy)
+		tst := New(tspy)
 
-	// --- When ---
-	cmd, ccx := tst.CmdAndCtx("name", NopFunc, "a", "b", "c")
+		// --- When ---
+		cmd, ccx := tst.CmdAndCtx("name", NopFunc, "a", "b", "c")
 
-	// --- Then ---
-	assert.Same(t, cmd, ccx.Cmd)
-	assert.Equal(t, "name", ccx.Cmd.Name())
-	assert.Equal(t, []string{"a", "b", "c"}, ccx.Cmd.Args())
+		// --- Then ---
+		assert.Same(t, cmd, ccx.Cmd)
+		assert.Equal(t, "name", ccx.Cmd.Name())
+		assert.Equal(t, []string{"a", "b", "c"}, ccx.Cmd.Args())
 
-	assert.Same(t, tst.Streams().Stdin(), ccx.Rng.Stdin())
-	assert.Same(t, tst.Streams().Stdout(), ccx.Rng.Stdout())
-	assert.Same(t, tst.Streams().Stderr(), ccx.Rng.Stderr())
-	assert.Equal(t, Sort(tst.Ring().EnvAll()), Sort(ccx.Rng.EnvAll()))
-	assert.NotSame(t, tst.Ring().EnvAll(), ccx.Rng.EnvAll())
+		assert.Same(t, tst.Streams().Stdin(), ccx.Rng.Stdin())
+		assert.Same(t, tst.Streams().Stdout(), ccx.Rng.Stdout())
+		assert.Same(t, tst.Streams().Stderr(), ccx.Rng.Stderr())
+		assert.Equal(t, Sort(tst.Ring().EnvAll()), Sort(ccx.Rng.EnvAll()))
+		assert.NotSame(t, tst.Ring().EnvAll(), ccx.Rng.EnvAll())
+	})
+
+	t.Run("error - parse", func(t *testing.T) {
+		// --- Given ---
+		tspy := tester.New(t)
+		tspy.ExpectCleanups(2)
+		tspy.ExpectError()
+		tspy.ExpectLogEqual("flag provided but not defined: -abc")
+		tspy.Close()
+
+		tst := New(tspy)
+
+		// --- When ---
+		cmd, ccx := tst.CmdAndCtx("name", NopFunc, "--abc")
+
+		// --- Then ---
+		assert.Nil(t, cmd)
+		assert.Nil(t, ccx)
+	})
 }
 
 func Test_Tester_Func(t *testing.T) {
