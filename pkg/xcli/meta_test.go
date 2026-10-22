@@ -14,14 +14,14 @@ import (
 func Test_Meta_MetaLookup(t *testing.T) {
 	t.Run("existing", func(t *testing.T) {
 		// --- Given ---
-		met := NewMeta().MetaSet("key", nil)
+		met := NewMeta().MetaSet("key", 1)
 
 		// --- When ---
 		have, ok := met.MetaLookup("key")
 
 		// --- Then ---
 		assert.True(t, ok)
-		assert.Nil(t, have)
+		assert.Equal(t, 1, have)
 	})
 
 	t.Run("not existing", func(t *testing.T) {
