@@ -1,0 +1,79 @@
+## v0.1.0 (Thu, 22 Oct 2026 20:36:47 UTC)
+- chore: scaffold project.
+- docs: add MIT license.
+- feat(xcli): add command line framework package.
+- fix(xcli): show help for -h when no help flag is defined.
+- fix(xcli): share metadata with subcommands at every depth.
+- fix(xcli): honor encoding.TextMarshaler in Marshal.
+- docs(xcli): document flag set output kept by WithFlags.
+- docs(xcli): correct RunCmd godoc.
+- docs(xcli): state that GetFlagSet searches ancestors only.
+- docs(xcli): correct the CmdCtx.Cmd field comment.
+- fix(xclitest): return nils from CmdAndCtx when parsing fails.
+- fix(xcli): match only the first Find path element against self.
+- fix(xclitest): copy the environment passed to WithEnv.
+- test(xcli): close files opened in the DetectTTY test.
+- refactor(xcli): declare ErrInvArgType with the other errors.
+- style(xcli): use a three-letter receiver name for Meta.
+- style(xcli): assert at compile time that RuleFunc implements Rule.
+- docs(xcli): document the zero values of Meta and Command.
+- docs: add package godoc for xcli and xclitest.
+- docs(xcli): add a runnable Command example.
+- test(xcli): cover NewStyle.
+- test(xcli): cover ShortDesc, LongDesc, Example and Args.
+- style(xcli): discard ignored WriteString results explicitly.
+- test: name actual and expected values have and want.
+- test: pass t.Context to code under test.
+- test: prefix error-path subtest names with "error - ".
+- test(xcli): follow the test function naming scheme.
+- test(xcli): order Command tests as their methods are declared.
+- test(xcli): shorten long subtest names.
+- test(xcli): give a duplicated Parse subtest its own name.
+- test: inline expected literals that fit on the line.
+- test: group test statements by subject.
+- test(xclitest): unexport the sorting test helper.
+- style: wrap lines over 80 columns.
+- docs: fix godoc grammar and typos.
+- test: give every test one Given, When and Then.
+- refactor(xcli): drop redundant nil checks in the TTY getters.
+- fix(xclitest): correct the sub-b-a help flag usage in TstCmdRequired.
+- fix(xcli): marshal named byte slices as text.
+- fix(xcli): report an unknown subcommand with ErrUnkCommand.
+- docs(xclitest): note that Ctx ignores args for a parsed command.
+- docs(xclitest): correct where GenPre stores its metadata.
+- fix(xcli): treat a nil args rule as the default rule.
+- test(xcli): cover Meta.MetaLookup and Meta.MetaDelete.
+- fix(xcli): drop trailing spaces from help option and command lines.
+- docs(xcli): document ErrReqMeta and ErrInvMeta as caller errors.
+- docs(xclitest): drop the UTC claim from the clock option comment.
+- fix(xclitest): correct the sub-b-a help flag usage in TstCmd.
+- test(xcli): cover Meta.MetaGet.
+- test(xcli): assert the value MetaLookup returns for an existing key.
+- fix(xcli): drop trailing spaces from all help lines.
+- docs(xcli): clarify that Marshal returns any byte slice as text.
+- ci: add GitHub Actions workflow running the tests.
+- docs(xcli): add runnable examples for the main Command features.
+- docs: write the README.
+- docs: drop the prerequisites section from the README.
+- refactor(xcli)!: stop embedding the flag set and metadata in Command.
+- feat(xcli)!: add Command.Execute and unexport Command.Run.
+- feat(xcli)!: add sentinels for argument and parse-state errors.
+- refactor(xclitest)!: move the test command trees to an internal package.
+- refactor!: move the CLI styles to the xclistyle package.
+- fix(xcli): cancel the RunCmd context on SIGINT.
+- feat(xcli): keep the stack trace of panics recovered by RunCmd.
+- feat(xcli)!: print requested help to standard output.
+- feat(xcli): show flag defaults in help.
+- ci: run the tests on Windows as well as Linux.
+- refactor(xcli)!: remove the Meta type.
+- refactor(xcli)!: unexport Command.ShouldRunUsage.
+- fix(xcli)!: return nil from GetFlagSet for an unknown command name.
+- feat(xcli): set MetaKeyColor in DetectTTY.
+- docs(xcli): state which command a pre-run hook sees as ccx.Cmd.
+- fix(xcli)!: reject parsing a command tree twice.
+- refactor(xcli): use the flag defaults rendered by xflag v0.12.0.
+- fix(xcli): keep subcommand metadata when adding it to a command.
+- fix(xcli): keep the context when a pre-run hook returns nil.
+- fix(xcli): indent every line of a multi-line long description.
+- docs(xcli): rewrap the package overview paragraph.
+
