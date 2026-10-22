@@ -6,6 +6,7 @@ require (
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/ctx42/ring v0.8.2
 	github.com/ctx42/testing v0.57.1
+	github.com/ctx42/testkit v0.16.3
 	github.com/ctx42/xflag v0.11.2
 	github.com/ctx42/xrr v0.18.3
 	github.com/mattn/go-isatty v0.0.24
@@ -17,7 +18,6 @@ require (
 	github.com/charmbracelet/x/ansi v0.8.0 // indirect
 	github.com/charmbracelet/x/cellbuf v0.0.13-0.20250311204145-2c3ea96c31dd // indirect
 	github.com/charmbracelet/x/term v0.2.1 // indirect
-	github.com/ctx42/testkit v0.16.3 // indirect
 	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
 	github.com/mattn/go-runewidth v0.0.16 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect

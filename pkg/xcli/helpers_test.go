@@ -6,14 +6,13 @@ package xcli_test
 import (
 	"context"
 	"errors"
-	"os"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/ctx42/ring/pkg/ring/ringtest"
 	"github.com/ctx42/testing/pkg/assert"
-	"github.com/ctx42/testing/pkg/must"
+	"github.com/ctx42/testkit/pkg/oskit"
 	"github.com/ctx42/xrr/pkg/xrr/xrrtest"
 
 	"github.com/ctx42/xcli/pkg/xcli/xclitest"
@@ -184,8 +183,8 @@ func Test_RunCmd(t *testing.T) {
 func Test_DetectTTY_IsStdOutTTY_IsStdErrTTY(t *testing.T) {
 	t.Run("stdout and stderr files", func(t *testing.T) {
 		// --- Given ---
-		sout := must.Value(os.Open("testdata/file0.txt"))
-		eout := must.Value(os.Open("testdata/file1.txt"))
+		sout := oskit.Open(t, "testdata/file0.txt")
+		eout := oskit.Open(t, "testdata/file1.txt")
 
 		tst := ringtest.New(t)
 		rng := tst.Ring()
