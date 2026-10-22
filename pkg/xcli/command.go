@@ -102,13 +102,19 @@ func NewCommand(name string, fn Func, opts ...func(*Command)) *Command {
 func (cmd *Command) Add(cs ...*Command) *Command {
 	for _, c := range cs {
 		c.parent = cmd
-		c.hidMeta = cmd.hidMeta
+		c.setMeta(cmd.hidMeta)
 		cmd.subs = append(cmd.subs, c)
-		for _, sub := range c.subs {
-			sub.hidMeta = cmd.hidMeta
-		}
 	}
 	return cmd
+}
+
+// setMeta sets the metadata collection on the command and all its
+// subcommands at every depth.
+func (cmd *Command) setMeta(meta Meta) {
+	cmd.hidMeta = meta
+	for _, sub := range cmd.subs {
+		sub.setMeta(meta)
+	}
 }
 
 // UsageFlagName lets command know what is the name of the help (usage) flag.

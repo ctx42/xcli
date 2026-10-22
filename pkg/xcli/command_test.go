@@ -113,6 +113,22 @@ func Test_Command_Add(t *testing.T) {
 		assert.Same(t, root.MetaAll(), sb.MetaAll())
 		assert.Same(t, root.MetaAll(), sba.MetaAll())
 	})
+
+	t.Run("share metadata at every depth", func(t *testing.T) {
+		// --- Given ---
+		root := NewCommand("root", nil)
+		sbaa := NewCommand("sub-b-a-a", nil)
+		sba := NewCommand("sub-b-a", nil).Add(sbaa)
+		sb := NewCommand("sub-b", nil).Add(sba)
+
+		// --- When ---
+		root.Add(sb)
+
+		// --- Then ---
+		assert.Same(t, root.MetaAll(), sb.MetaAll())
+		assert.Same(t, root.MetaAll(), sba.MetaAll())
+		assert.Same(t, root.MetaAll(), sbaa.MetaAll())
+	})
 }
 
 func Test_Command_UsageFlagName(t *testing.T) {
