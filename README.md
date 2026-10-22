@@ -29,7 +29,7 @@ environment, and the `xclitest` package wraps that setup for you.
 - Metadata shared by every command in the tree.
 - Clear errors for a missing or mistyped subcommand.
 - `Execute` and `RunCmd` turn panics into errors and cancel the context on
-  `SIGTERM`.
+  `SIGINT` and `SIGTERM`.
 - Terminal detection for standard output and standard error.
 - Test helpers in `xclitest` with captured streams and ready-made command
   functions.

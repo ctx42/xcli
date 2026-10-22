@@ -43,7 +43,8 @@ func Marshal(v any) ([]byte, error) {
 
 // RunCmd runs the command selected by a successful [Command.Parse] on the
 // root command and recovers from panics. A recovered panic is returned as an
-// error. The context passed to the command is canceled on SIGTERM.
+// error. The context passed to the command is canceled on SIGINT (Ctrl-C)
+// and SIGTERM.
 func RunCmd(ctx context.Context, rng *ring.Ring, cmd *Command) (err error) {
 	defer func() {
 		rec := recover()
@@ -62,7 +63,7 @@ func RunCmd(ctx context.Context, rng *ring.Ring, cmd *Command) (err error) {
 		}
 	}()
 
-	ctx, cxl := signal.NotifyContext(ctx, syscall.SIGTERM)
+	ctx, cxl := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
 	defer cxl()
 	return cmd.run(ctx, rng)
 }
