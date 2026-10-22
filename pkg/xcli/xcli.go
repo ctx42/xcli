@@ -45,6 +45,10 @@ const (
 	MetaKeyColor = "cli-meta-color"
 )
 
+// PanicStackKey is the error metadata key under which [RunCmd] stores the
+// stack trace of a recovered panic.
+const PanicStackKey = "panic-stack"
+
 // CLI related errors.
 var (
 	// ErrNoDefault is returned when a command has no function to run.

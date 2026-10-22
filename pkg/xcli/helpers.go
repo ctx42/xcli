@@ -6,14 +6,15 @@ package xcli
 import (
 	"context"
 	"encoding"
-	"errors"
 	"fmt"
 	"os"
 	"os/signal"
 	"reflect"
+	"runtime/debug"
 	"syscall"
 
 	"github.com/ctx42/ring/pkg/ring"
+	"github.com/ctx42/xrr/pkg/xrr"
 	"github.com/mattn/go-isatty"
 )
 
@@ -43,23 +44,27 @@ func Marshal(v any) ([]byte, error) {
 
 // RunCmd runs the command selected by a successful [Command.Parse] on the
 // root command and recovers from panics. A recovered panic is returned as an
-// error. The context passed to the command is canceled on SIGINT (Ctrl-C)
-// and SIGTERM.
+// error carrying the panic stack trace in its metadata under [PanicStackKey];
+// read it with [xrr.GetStr]. A panic with an error value wraps that error.
+// The context passed to the command is canceled on SIGINT (Ctrl-C) and
+// SIGTERM.
 func RunCmd(ctx context.Context, rng *ring.Ring, cmd *Command) (err error) {
 	defer func() {
 		rec := recover()
 		if rec == nil {
 			return
 		}
+		meta := xrr.Meta().Str(PanicStackKey, string(debug.Stack())).Option()
 		switch e := rec.(type) {
 		case string:
-			err = errors.New(e)
+			err = xrr.New(e, meta)
 		case error:
-			err = e
+			err = xrr.New("", xrr.WithCause(e), meta)
 		case fmt.Stringer:
-			err = errors.New(e.String())
+			err = xrr.New(e.String(), meta)
 		default:
-			err = fmt.Errorf("do not know how to handle `%T` panics", rec)
+			const format = "do not know how to handle `%T` panics"
+			err = xrr.Newf(format, rec, meta)
 		}
 	}()
 

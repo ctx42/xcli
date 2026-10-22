@@ -14,6 +14,7 @@ import (
 	"github.com/ctx42/ring/pkg/ring/ringtest"
 	"github.com/ctx42/testing/pkg/assert"
 	"github.com/ctx42/testkit/pkg/oskit"
+	"github.com/ctx42/xrr/pkg/xrr"
 	"github.com/ctx42/xrr/pkg/xrr/xrrtest"
 
 	"github.com/ctx42/xcli/pkg/xcli/xclitest"
@@ -80,6 +81,9 @@ func Test_Marshal_tabular(t *testing.T) {
 		})
 	}
 }
+
+// panicking is a [Func] which panics with its own name.
+func panicking(_ context.Context, _ *CmdCtx) error { panic("panicking") }
 
 func Test_RunCmd(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
@@ -159,6 +163,36 @@ func Test_RunCmd(t *testing.T) {
 
 		// --- Then ---
 		assert.ErrorEqual(t, "panics with Stringer", err)
+	})
+
+	t.Run("error - panic keeps stack", func(t *testing.T) {
+		// --- Given ---
+		tst := ringtest.New(t)
+		cmd := NewCommand("root", panicking)
+		assert.NoError(t, cmd.Parse())
+
+		// --- When ---
+		err := RunCmd(t.Context(), tst.Ring(), cmd)
+
+		// --- Then ---
+		assert.ErrorEqual(t, "panicking", err)
+		stack, ok := xrr.GetStr(err, PanicStackKey)
+		assert.True(t, ok)
+		assert.Contain(t, "xcli_test.panicking", stack)
+	})
+
+	t.Run("error - panic with error wraps it", func(t *testing.T) {
+		// --- Given ---
+		tst := ringtest.New(t)
+		fn := func(_ context.Context, _ *CmdCtx) error { panic(ErrTest) }
+		cmd := NewCommand("root", fn)
+		assert.NoError(t, cmd.Parse())
+
+		// --- When ---
+		err := RunCmd(t.Context(), tst.Ring(), cmd)
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrTest, err)
 	})
 
 	t.Run("error - panic with unsupported type", func(t *testing.T) {
