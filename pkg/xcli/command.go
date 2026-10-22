@@ -22,6 +22,11 @@ import (
 // PreRun is the signature of functions run before a command. It takes the
 // context and the command context, and returns a potentially modified context
 // and an error. The caller must use the returned context.
+//
+// During a hook, ccx.Cmd is the command the hook was registered on, which is
+// the selected command or one of its ancestors. Metadata is shared by the
+// whole tree, so values a hook sets with [Command.MetaSet] reach the selected
+// command.
 type PreRun func(ctx context.Context, ccx *CmdCtx) (context.Context, error)
 
 // WithFlags is option for [NewCommand] setting flag set to use instead of
