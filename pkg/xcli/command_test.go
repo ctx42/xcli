@@ -229,6 +229,50 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 	})
 }
 
+func Test_Command_ShortDesc(t *testing.T) {
+	// --- Given ---
+	cmd := NewCommand("cmd", nil)
+
+	// --- When ---
+	have := cmd.ShortDesc("short desc")
+
+	// --- Then ---
+	assert.Same(t, cmd, have)
+
+	assert.Equal(t, "Usage of `cmd`:\n\n  short desc\n", cmd.Help())
+}
+
+func Test_Command_LongDesc(t *testing.T) {
+	// --- Given ---
+	cmd := NewCommand("cmd", nil)
+
+	// --- When ---
+	have := cmd.LongDesc("long desc")
+
+	// --- Then ---
+	assert.Same(t, cmd, have)
+
+	assert.Equal(t, "Usage of `cmd`:\n\n  long desc\n", cmd.Help())
+}
+
+func Test_Command_Example(t *testing.T) {
+	// --- Given ---
+	cmd := NewCommand("cmd", nil).Example("cmd a", "first")
+
+	// --- When ---
+	have := cmd.Example("cmd b", "second")
+
+	// --- Then ---
+	assert.Same(t, cmd, have)
+
+	want := "" +
+		"Usage of `cmd`:\n\n" +
+		"EXAMPLES:\n" +
+		"  cmd a    # first\n" +
+		"  cmd b    # second\n"
+	assert.Equal(t, want, cmd.Help())
+}
+
 func Test_Command_ArgsRule(t *testing.T) {
 	// --- Given ---
 	tst := xclitest.New(t)
@@ -242,6 +286,19 @@ func Test_Command_ArgsRule(t *testing.T) {
 	wMsg := "command `root` requires minimum 3 arguments 2 given"
 	assert.ErrorEqual(t, wMsg, err)
 	assert.Equal(t, []string{"arg0", "arg1"}, cmd.Args())
+}
+
+func Test_Command_Args(t *testing.T) {
+	// --- Given ---
+	cmd := NewCommand("cmd", nil).ArgsRule(MinArgsRule(0))
+	cmd.Bool("flag", false, "usage")
+	assert.NoError(t, cmd.Parse("--flag", "arg0", "arg1"))
+
+	// --- When ---
+	have := cmd.Args()
+
+	// --- Then ---
+	assert.Equal(t, []string{"arg0", "arg1"}, have)
 }
 
 func Test_Command_Find(t *testing.T) {
