@@ -37,6 +37,30 @@ func Test_Meta_MetaLookup(t *testing.T) {
 	})
 }
 
+func Test_Meta_MetaGet(t *testing.T) {
+	t.Run("existing", func(t *testing.T) {
+		// --- Given ---
+		met := NewMeta().MetaSet("key", 1)
+
+		// --- When ---
+		have := met.MetaGet("key")
+
+		// --- Then ---
+		assert.Equal(t, 1, have)
+	})
+
+	t.Run("not existing", func(t *testing.T) {
+		// --- Given ---
+		met := NewMeta()
+
+		// --- When ---
+		have := met.MetaGet("key")
+
+		// --- Then ---
+		assert.Nil(t, have)
+	})
+}
+
 func Test_Meta_MetaDelete(t *testing.T) {
 	t.Run("existing", func(t *testing.T) {
 		// --- Given ---
