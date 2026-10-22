@@ -385,7 +385,8 @@ func (cmd *Command) FullName() string {
 	return name
 }
 
-// Help returns the command's help string.
+// Help returns the command's help string, with the padding tabwriter adds
+// at the end of lines removed.
 func (cmd *Command) Help() string {
 	var buf strings.Builder
 	header := fmt.Sprintf("Usage of %#q:\n", cmd.FullName())
@@ -413,11 +414,14 @@ func (cmd *Command) Help() string {
 		_ = tw.Flush()
 	}
 	_, _ = buf.WriteString(cmd.help())
-	return buf.String()
+	lines := strings.Split(buf.String(), "\n")
+	for i, line := range lines {
+		lines[i] = strings.TrimRight(line, " ")
+	}
+	return strings.Join(lines, "\n")
 }
 
-// help returns command's options and subcommands summary, with the padding
-// tabwriter adds at the end of lines removed.
+// help returns command's options and subcommands summary.
 func (cmd *Command) help() string {
 	buf := &bytes.Buffer{}
 	tw := tabwriter.NewWriter(buf, 0, 8, 4, ' ', 0)
@@ -438,9 +442,5 @@ func (cmd *Command) help() string {
 		_, _ = fmt.Fprintf(tw, "  %s\t%s\n", sub.Name(), sub.shortDesc)
 	}
 	_ = tw.Flush()
-	lines := strings.Split(buf.String(), "\n")
-	for i, line := range lines {
-		lines[i] = strings.TrimRight(line, " ")
-	}
-	return strings.Join(lines, "\n")
+	return buf.String()
 }

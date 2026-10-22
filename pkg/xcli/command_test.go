@@ -953,7 +953,7 @@ func Test_Command_Help(t *testing.T) {
 			"  main command\n\n" +
 			"EXAMPLES:\n" +
 			"  root --root-def abc    # using long form flag\n" +
-			"  root -r abc            \n" +
+			"  root -r abc\n" +
 			"  root -r abc            # using short form flag\n" +
 			"\n" +
 			"OPTIONS:\n" +
