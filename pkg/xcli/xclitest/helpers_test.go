@@ -1,0 +1,45 @@
+// SPDX-FileCopyrightText: (c) 2026 Rafal Zajac
+// SPDX-License-Identifier: MIT
+
+package xclitest
+
+import (
+	"context"
+	"testing"
+
+	"github.com/ctx42/testing/pkg/assert"
+
+	"github.com/ctx42/xcli/pkg/xcli"
+)
+
+func Test_DbgFunc(t *testing.T) {
+	// --- Given ---
+	ctx := context.Background()
+	var called bool
+	fn := func(ctx context.Context, ccx *xcli.CmdCtx) error {
+		called = true
+		return nil
+	}
+	tst := New(t).WetStdout()
+	_, ccx := tst.CmdAndCtx("name", fn, "arg0", "arg1")
+
+	// --- When ---
+	err := DbgFunc(ctx, ccx)
+
+	// --- Then ---
+	assert.NoError(t, err)
+	assert.False(t, called)
+	want := "command `name` with args [arg0 arg1]"
+	assert.Equal(t, want, tst.Stdout())
+}
+
+func Test_NopFunc(t *testing.T) {
+	// --- Given ---
+	var err error
+
+	// --- When ---
+	assert.NoPanic(t, func() { err = NopFunc(nil, &xcli.CmdCtx{}) })
+
+	// --- Then ---
+	assert.NoError(t, err)
+}
