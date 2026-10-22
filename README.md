@@ -32,10 +32,6 @@ environment, and the `xclitest` package wraps that setup for you.
 - Terminal detection for standard output and standard error.
 - Test helpers in `xclitest` with captured streams and ready-made commands.
 
-## Prerequisites
-
-- Go 1.26 or newer.
-
 ## Install
 
 ```shell
