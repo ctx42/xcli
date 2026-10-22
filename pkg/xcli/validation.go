@@ -21,7 +21,8 @@ type RuleFunc func(v any) error
 // Validate calls fn(v).
 func (fn RuleFunc) Validate(v any) error { return fn(v) }
 
-// ArgsRule requires command to have n arguments.
+// ArgsRule requires command to have n arguments. Its error wraps
+// [ErrArgCount].
 func ArgsRule(n int) Rule {
 	return RuleFunc(func(v any) error {
 		vv, ok := v.([]string)
@@ -30,19 +31,17 @@ func ArgsRule(n int) Rule {
 		}
 		if len(vv) != n {
 			if n == 0 {
-				return fmt.Errorf("requires no arguments %d given", len(vv))
+				return fmt.Errorf("%w: want none, got %d", ErrArgCount, len(vv))
 			}
-			p := "arguments"
-			if n == 1 {
-				p = "argument"
-			}
-			return fmt.Errorf("requires %d %s %d given", n, p, len(vv))
+			const format = "%w: want %d, got %d"
+			return fmt.Errorf(format, ErrArgCount, n, len(vv))
 		}
 		return nil
 	})
 }
 
-// MinArgsRule requires command to have minimum n arguments.
+// MinArgsRule requires command to have minimum n arguments. Its error wraps
+// [ErrArgCount].
 func MinArgsRule(n int) Rule {
 	return RuleFunc(func(v any) error {
 		vv, ok := v.([]string)
@@ -50,11 +49,8 @@ func MinArgsRule(n int) Rule {
 			return ErrInvArgType
 		}
 		if len(vv) < n {
-			p := "arguments"
-			if n == 1 {
-				p = "argument"
-			}
-			return fmt.Errorf("requires minimum %d %s %d given", n, p, len(vv))
+			const format = "%w: want at least %d, got %d"
+			return fmt.Errorf(format, ErrArgCount, n, len(vv))
 		}
 		return nil
 	})

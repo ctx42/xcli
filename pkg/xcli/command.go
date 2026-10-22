@@ -304,7 +304,7 @@ func (cmd *Command) PreRun(fns ...PreRun) *Command {
 // they will be run in the order from root command to the selected one.
 func (cmd *Command) run(ctx context.Context, rng *ring.Ring) (err error) {
 	if cmd.found == nil || !cmd.flags.Parsed() {
-		return errors.New("not parsed arguments")
+		return ErrNotParsed
 	}
 	found := cmd.found
 	ccx := NewCmdCtx(rng, found)
@@ -320,7 +320,7 @@ func (cmd *Command) run(ctx context.Context, rng *ring.Ring) (err error) {
 		return fmt.Errorf("%w: %#q", ErrUnkCommand, found.args[0])
 	}
 	if err = found.argsRule.Validate(ccx.Cmd.Args()); err != nil {
-		return fmt.Errorf("command %#q %w", found.Name(), err)
+		return fmt.Errorf("command %#q: %w", found.Name(), err)
 	}
 	if ctx, err = runPreRun(ctx, ccx); err != nil {
 		return err

@@ -34,7 +34,8 @@ func Test_ArgsRule(t *testing.T) {
 		err := ArgsRule(0).Validate([]string{"arg0"})
 
 		// --- Then ---
-		assert.ErrorEqual(t, "requires no arguments 1 given", err)
+		assert.ErrorIs(t, ErrArgCount, err)
+		assert.ErrorEqual(t, "wrong number of arguments: want none, got 1", err)
 	})
 
 	t.Run("requires one given one", func(t *testing.T) {
@@ -64,7 +65,8 @@ func Test_ArgsRule(t *testing.T) {
 		err := ArgsRule(1).Validate([]string{})
 
 		// --- Then ---
-		assert.ErrorEqual(t, "requires 1 argument 0 given", err)
+		assert.ErrorIs(t, ErrArgCount, err)
+		assert.ErrorEqual(t, "wrong number of arguments: want 1, got 0", err)
 	})
 
 	t.Run("error - requires one given two", func(t *testing.T) {
@@ -72,7 +74,8 @@ func Test_ArgsRule(t *testing.T) {
 		err := ArgsRule(1).Validate([]string{"arg0", "arg1"})
 
 		// --- Then ---
-		assert.ErrorEqual(t, "requires 1 argument 2 given", err)
+		assert.ErrorIs(t, ErrArgCount, err)
+		assert.ErrorEqual(t, "wrong number of arguments: want 1, got 2", err)
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {
@@ -117,7 +120,9 @@ func Test_MinArgsRule(t *testing.T) {
 		err := MinArgsRule(1).Validate([]string{})
 
 		// --- Then ---
-		assert.ErrorEqual(t, "requires minimum 1 argument 0 given", err)
+		assert.ErrorIs(t, ErrArgCount, err)
+		want := "wrong number of arguments: want at least 1, got 0"
+		assert.ErrorEqual(t, want, err)
 	})
 
 	t.Run("error - requires minimum 2 given 1", func(t *testing.T) {
@@ -128,7 +133,9 @@ func Test_MinArgsRule(t *testing.T) {
 		err := MinArgsRule(2).Validate(args)
 
 		// --- Then ---
-		assert.ErrorEqual(t, "requires minimum 2 arguments 1 given", err)
+		assert.ErrorIs(t, ErrArgCount, err)
+		want := "wrong number of arguments: want at least 2, got 1"
+		assert.ErrorEqual(t, want, err)
 	})
 
 	t.Run("error - invalid type", func(t *testing.T) {

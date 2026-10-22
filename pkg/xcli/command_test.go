@@ -376,8 +376,11 @@ func Test_Command_ArgsRule(t *testing.T) {
 		err := cmd.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
-		want := "command `root` requires minimum 3 arguments 2 given"
+		want := "" +
+			"command `root`: wrong number of arguments: " +
+			"want at least 3, got 2"
 		assert.ErrorEqual(t, want, err)
+		assert.ErrorIs(t, ErrArgCount, err)
 		assert.Equal(t, []string{"arg0", "arg1"}, cmd.Args())
 	})
 
@@ -391,8 +394,9 @@ func Test_Command_ArgsRule(t *testing.T) {
 		err := cmd.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
-		want := "command `root` requires no arguments 1 given"
+		want := "command `root`: wrong number of arguments: want none, got 1"
 		assert.ErrorEqual(t, want, err)
+		assert.ErrorIs(t, ErrArgCount, err)
 	})
 }
 
@@ -964,8 +968,9 @@ func Test_Command_Run(t *testing.T) {
 		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
-		want := "command `sub-a` requires no arguments 1 given"
+		want := "command `sub-a`: wrong number of arguments: want none, got 1"
 		assert.ErrorEqual(t, want, err)
+		assert.ErrorIs(t, ErrArgCount, err)
 		assert.Equal(t, []string{"arg0"}, root.Args())
 	})
 
@@ -992,7 +997,8 @@ func Test_Command_Run(t *testing.T) {
 		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
-		assert.ErrorEqual(t, "not parsed arguments", err)
+		assert.ErrorIs(t, ErrNotParsed, err)
+		assert.ErrorEqual(t, "command arguments not parsed", err)
 	})
 }
 

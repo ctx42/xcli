@@ -162,7 +162,7 @@ for _, args := range [][]string{{}, {"lsit"}, {"add"}} {
 // Output:
 // subcommand required for `todo`
 // unknown command: `lsit`
-// command `add` requires minimum 1 argument 0 given
+// command `add`: wrong number of arguments: want at least 1, got 0
 ```
 
 The errors wrap the `ErrSubCmdReq` and `ErrUnkCommand` sentinels, so callers

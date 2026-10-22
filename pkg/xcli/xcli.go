@@ -66,6 +66,14 @@ var (
 	// never returns it.
 	ErrInvMeta = xrr.New("invalid command metadata key", "ECCmdInvMeta")
 
+	// ErrArgCount is returned when a command gets a number of arguments its
+	// [Rule] does not allow.
+	ErrArgCount = xrr.New("wrong number of arguments", "ECArgCount")
+
+	// ErrNotParsed is returned when a command runs before its arguments were
+	// parsed with [Command.Parse].
+	ErrNotParsed = xrr.New("command arguments not parsed", "ECNotParsed")
+
 	// ErrInvArgType is returned when the command arguments passed to a rule
 	// are not a slice of strings.
 	ErrInvArgType = xrr.New(
