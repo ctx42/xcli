@@ -297,89 +297,6 @@ func Test_Command_Args(t *testing.T) {
 	assert.Equal(t, []string{"arg0", "arg1"}, have)
 }
 
-func Test_Command_Find(t *testing.T) {
-	t.Run("find leaf command", func(t *testing.T) {
-		// --- Given ---
-		root := xclitest.TstCmd()
-
-		// --- When ---
-		have := root.Find("root", "sub-b", "sub-b-a")
-
-		// --- Then ---
-		assert.NotNil(t, have)
-		assert.Equal(t, "sub-b-a", have.Name())
-	})
-
-	t.Run("find first level command", func(t *testing.T) {
-		// --- Given ---
-		root := xclitest.TstCmd()
-
-		// --- When ---
-		have := root.Find("root", "sub-b")
-
-		// --- Then ---
-		assert.NotNil(t, have)
-		assert.Equal(t, "sub-b", have.Name())
-	})
-
-	t.Run("find root command", func(t *testing.T) {
-		// --- Given ---
-		root := xclitest.TstCmd()
-
-		// --- When ---
-		have := root.Find("root")
-
-		// --- Then ---
-		assert.NotNil(t, have)
-		assert.Equal(t, "root", have.Name())
-	})
-
-	t.Run("unknown leaf command", func(t *testing.T) {
-		// --- Given ---
-		root := xclitest.TstCmd()
-
-		// --- When ---
-		have := root.Find("root", "sub-b", "sub-b-a", "sub-b-a-a")
-
-		// --- Then ---
-		assert.Nil(t, have)
-	})
-
-	t.Run("unknown command", func(t *testing.T) {
-		// --- Given ---
-		root := xclitest.TstCmd()
-
-		// --- When ---
-		have := root.Find("unknown")
-
-		// --- Then ---
-		assert.Nil(t, have)
-	})
-
-	t.Run("subcommand named like its parent", func(t *testing.T) {
-		// --- Given ---
-		sub := NewCommand("cmd", nil)
-		root := NewCommand("cmd", nil).Add(sub)
-
-		// --- When ---
-		have := root.Find("cmd", "cmd")
-
-		// --- Then ---
-		assert.Same(t, sub, have)
-	})
-
-	t.Run("root name repeated", func(t *testing.T) {
-		// --- Given ---
-		root := xclitest.TstCmd()
-
-		// --- When ---
-		have := root.Find("root", "root")
-
-		// --- Then ---
-		assert.Nil(t, have)
-	})
-}
-
 func Test_Command_Parse(t *testing.T) {
 	t.Run("parse flags", func(t *testing.T) {
 		// --- Given ---
@@ -510,6 +427,198 @@ func Test_Command_Parse(t *testing.T) {
 
 		// --- Then ---
 		assert.NoError(t, err)
+	})
+}
+
+func Test_Command_Find(t *testing.T) {
+	t.Run("find leaf command", func(t *testing.T) {
+		// --- Given ---
+		root := xclitest.TstCmd()
+
+		// --- When ---
+		have := root.Find("root", "sub-b", "sub-b-a")
+
+		// --- Then ---
+		assert.NotNil(t, have)
+		assert.Equal(t, "sub-b-a", have.Name())
+	})
+
+	t.Run("find first level command", func(t *testing.T) {
+		// --- Given ---
+		root := xclitest.TstCmd()
+
+		// --- When ---
+		have := root.Find("root", "sub-b")
+
+		// --- Then ---
+		assert.NotNil(t, have)
+		assert.Equal(t, "sub-b", have.Name())
+	})
+
+	t.Run("find root command", func(t *testing.T) {
+		// --- Given ---
+		root := xclitest.TstCmd()
+
+		// --- When ---
+		have := root.Find("root")
+
+		// --- Then ---
+		assert.NotNil(t, have)
+		assert.Equal(t, "root", have.Name())
+	})
+
+	t.Run("unknown leaf command", func(t *testing.T) {
+		// --- Given ---
+		root := xclitest.TstCmd()
+
+		// --- When ---
+		have := root.Find("root", "sub-b", "sub-b-a", "sub-b-a-a")
+
+		// --- Then ---
+		assert.Nil(t, have)
+	})
+
+	t.Run("unknown command", func(t *testing.T) {
+		// --- Given ---
+		root := xclitest.TstCmd()
+
+		// --- When ---
+		have := root.Find("unknown")
+
+		// --- Then ---
+		assert.Nil(t, have)
+	})
+
+	t.Run("subcommand named like its parent", func(t *testing.T) {
+		// --- Given ---
+		sub := NewCommand("cmd", nil)
+		root := NewCommand("cmd", nil).Add(sub)
+
+		// --- When ---
+		have := root.Find("cmd", "cmd")
+
+		// --- Then ---
+		assert.Same(t, sub, have)
+	})
+
+	t.Run("root name repeated", func(t *testing.T) {
+		// --- Given ---
+		root := xclitest.TstCmd()
+
+		// --- When ---
+		have := root.Find("root", "root")
+
+		// --- Then ---
+		assert.Nil(t, have)
+	})
+}
+
+func Test_Command_PreRun_RunPreRun(t *testing.T) {
+	t.Run("error - pre run", func(t *testing.T) {
+		// --- Given ---
+		pre := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
+			return nil, ErrTest
+		}
+		cmd, ccx := xclitest.New(t).CmdAndCtx("root", nil)
+
+		// --- When ---
+		have := cmd.PreRun(pre)
+
+		// --- Then ---
+		assert.Same(t, cmd, have)
+
+		// --- When ---
+		haveCtx, err := RunPreRun(t.Context(), ccx)
+
+		// --- Then ---
+		assert.Nil(t, haveCtx)
+		assert.ErrorIs(t, ErrTest, err)
+	})
+
+	t.Run("error - stops at first failing pre run", func(t *testing.T) {
+		// --- Given ---
+		var pre0ran, pre1ran bool
+		pre0 := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
+			pre0ran = true
+			return nil, ErrTest
+		}
+
+		pre1 := func(ctx context.Context, ccx *CmdCtx) (context.Context, error) {
+			pre1ran = true
+			return ctx, nil
+		}
+
+		cmd, ccx := xclitest.New(t).CmdAndCtx("root", nil)
+
+		// --- When ---
+		have := cmd.PreRun(pre0, pre1)
+
+		// --- Then ---
+		assert.Same(t, cmd, have)
+
+		// --- When ---
+		haveCtx, err := RunPreRun(t.Context(), ccx)
+
+		// --- Then ---
+		assert.Nil(t, haveCtx)
+		assert.ErrorIs(t, ErrTest, err)
+		assert.True(t, pre0ran)
+		assert.False(t, pre1ran)
+	})
+}
+
+func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
+	t.Run("all commands in the chain have run pre-run", func(t *testing.T) {
+		// --- Given ---
+		tst := ringtest.New(t).WetStderr()
+		root := xclitest.TstCmdPreRun()
+		root.MetaSet("my", 1)
+		assert.NoError(t, root.Parse("sub-b", "sub-b-a"))
+
+		// --- When ---
+		err := root.Run(t.Context(), tst.Ring())
+
+		// --- Then ---
+		assert.NoError(t, err)
+		want := "dbg-pre: my: 1\n root: 1\n sub-b: 1\n sub-b-a: 1\n"
+		assert.Equal(t, want, tst.Stderr())
+		assert.Empty(t, root.Args())
+	})
+
+	t.Run("some commands in the chain have run pre-run", func(t *testing.T) {
+		// --- Given ---
+		tst := ringtest.New(t).WetStderr()
+		root := xclitest.TstCmdPreRun()
+		root.MetaSet("my", 1)
+		assert.NoError(t, root.Parse("sub-a", "sub-a-a"))
+
+		// --- When ---
+		err := root.Run(t.Context(), tst.Ring())
+
+		// --- Then ---
+		assert.NoError(t, err)
+		want := "dbg-pre: my: 1\n root: 1\n sub-a-a: 1\n"
+		assert.Equal(t, want, tst.Stderr())
+		assert.Empty(t, root.Args())
+	})
+
+	t.Run("error - root pre run", func(t *testing.T) {
+		// --- Given ---
+		pre := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
+			return nil, ErrTest
+		}
+
+		tst := ringtest.New(t)
+		root := xclitest.TstCmdPreRun().PreRun(pre)
+		root.MetaSet("my", 1)
+		assert.NoError(t, root.Parse("sub-a", "sub-a-a"))
+
+		// --- When ---
+		err := root.Run(t.Context(), tst.Ring())
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrTest, err)
+		assert.Empty(t, root.Args())
 	})
 }
 
@@ -703,115 +812,6 @@ func Test_Command_Run(t *testing.T) {
 		// --- Then ---
 		want := "not parsed arguments"
 		assert.ErrorEqual(t, want, err)
-	})
-}
-
-func Test_Command_PreRun_RunPreRun(t *testing.T) {
-	t.Run("error - pre run", func(t *testing.T) {
-		// --- Given ---
-		pre := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
-			return nil, ErrTest
-		}
-		cmd, ccx := xclitest.New(t).CmdAndCtx("root", nil)
-
-		// --- When ---
-		have := cmd.PreRun(pre)
-
-		// --- Then ---
-		assert.Same(t, cmd, have)
-
-		// --- When ---
-		haveCtx, err := RunPreRun(t.Context(), ccx)
-
-		// --- Then ---
-		assert.Nil(t, haveCtx)
-		assert.ErrorIs(t, ErrTest, err)
-	})
-
-	t.Run("error - stops at first failing pre run", func(t *testing.T) {
-		// --- Given ---
-		var pre0ran, pre1ran bool
-		pre0 := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
-			pre0ran = true
-			return nil, ErrTest
-		}
-
-		pre1 := func(ctx context.Context, ccx *CmdCtx) (context.Context, error) {
-			pre1ran = true
-			return ctx, nil
-		}
-
-		cmd, ccx := xclitest.New(t).CmdAndCtx("root", nil)
-
-		// --- When ---
-		have := cmd.PreRun(pre0, pre1)
-
-		// --- Then ---
-		assert.Same(t, cmd, have)
-
-		// --- When ---
-		haveCtx, err := RunPreRun(t.Context(), ccx)
-
-		// --- Then ---
-		assert.Nil(t, haveCtx)
-		assert.ErrorIs(t, ErrTest, err)
-		assert.True(t, pre0ran)
-		assert.False(t, pre1ran)
-	})
-}
-
-func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
-	t.Run("all commands in the chain have run pre-run", func(t *testing.T) {
-		// --- Given ---
-		tst := ringtest.New(t).WetStderr()
-		root := xclitest.TstCmdPreRun()
-		root.MetaSet("my", 1)
-		assert.NoError(t, root.Parse("sub-b", "sub-b-a"))
-
-		// --- When ---
-		err := root.Run(t.Context(), tst.Ring())
-
-		// --- Then ---
-		assert.NoError(t, err)
-		want := "dbg-pre: my: 1\n root: 1\n sub-b: 1\n sub-b-a: 1\n"
-		assert.Equal(t, want, tst.Stderr())
-		assert.Empty(t, root.Args())
-	})
-
-	t.Run("some commands in the chain have run pre-run", func(t *testing.T) {
-		// --- Given ---
-		tst := ringtest.New(t).WetStderr()
-		root := xclitest.TstCmdPreRun()
-		root.MetaSet("my", 1)
-		assert.NoError(t, root.Parse("sub-a", "sub-a-a"))
-
-		// --- When ---
-		err := root.Run(t.Context(), tst.Ring())
-
-		// --- Then ---
-		assert.NoError(t, err)
-		want := "dbg-pre: my: 1\n root: 1\n sub-a-a: 1\n"
-		assert.Equal(t, want, tst.Stderr())
-		assert.Empty(t, root.Args())
-	})
-
-	t.Run("error - root pre run", func(t *testing.T) {
-		// --- Given ---
-		pre := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
-			return nil, ErrTest
-		}
-
-		tst := ringtest.New(t)
-		root := xclitest.TstCmdPreRun().PreRun(pre)
-		root.MetaSet("my", 1)
-		assert.NoError(t, root.Parse("sub-a", "sub-a-a"))
-
-		// --- When ---
-		err := root.Run(t.Context(), tst.Ring())
-
-		// --- Then ---
-		assert.ErrorIs(t, ErrTest, err)
-		assert.Empty(t, root.Args())
 	})
 }
 
