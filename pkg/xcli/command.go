@@ -362,18 +362,14 @@ func runPreRun(ctx context.Context, ccx *CmdCtx) (context.Context, error) {
 }
 
 // GetFlagSet returns the flag set of the command or of its closest ancestor
-// with the given name. Subcommands are not searched. If no such command
-// exists, it returns an "empty" flag set, so you can still do chain method
-// calls.
+// with the given name, or nil when there is no such command. Subcommands are
+// not searched.
 func (cmd *Command) GetFlagSet(name string) *xflag.FlagSet {
 	if cmd.Name() == name {
 		return cmd.flags
 	}
 	if cmd.parent == nil {
-		fs := xflag.NewFlagSet(name, cmd.flags.ErrorHandling())
-		fs.Usage = nil
-		fs.SetOutput(cmd.flags.Output())
-		return fs
+		return nil
 	}
 	return cmd.parent.GetFlagSet(name)
 }

@@ -1026,13 +1026,20 @@ func Test_Command_GetFlagSet(t *testing.T) {
 		assert.Equal(t, "root-def", have.GetString("root"))
 	})
 
-	t.Run("unknown root", func(t *testing.T) {
+	t.Run("unknown command", func(t *testing.T) {
 		// --- When ---
 		have := subBA.GetFlagSet("unknown")
 
 		// --- Then ---
-		assert.Empty(t, have.GetString("root"))
-		assert.Equal(t, "unknown", have.Name())
+		assert.Nil(t, have)
+	})
+
+	t.Run("subcommand is not searched", func(t *testing.T) {
+		// --- When ---
+		have := root.GetFlagSet("sub-b-a")
+
+		// --- Then ---
+		assert.Nil(t, have)
 	})
 
 	t.Run("unknown root flag", func(t *testing.T) {
