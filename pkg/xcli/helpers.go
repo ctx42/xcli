@@ -5,6 +5,7 @@ package xcli
 
 import (
 	"context"
+	"encoding"
 	"errors"
 	"fmt"
 	"os"
@@ -20,15 +21,21 @@ func defaultFunc(_ context.Context, ccx *CmdCtx) error {
 	return fmt.Errorf("%w for %#q", ErrNoDefault, ccx.Cmd.Name())
 }
 
-// Marshal marshals v to string.
+// Marshal marshals v to a byte slice suitable for display on the CLI.
 //
-// If v implements Marshaler or MarshalText interfaces, it will be used.
+// It uses the [Marshaler] or [encoding.TextMarshaler] implementation of v, in
+// that order. Otherwise, a byte slice is returned as text and any other value
+// is formatted with the %v verb.
 func Marshal(v any) ([]byte, error) {
-	if m, ok := v.(Marshaler); ok {
-		return m.MarshalCLI()
+	switch val := v.(type) {
+	case Marshaler:
+		return val.MarshalCLI()
+	case encoding.TextMarshaler:
+		return val.MarshalText()
+	case []byte:
+		return fmt.Appendf(nil, "%s", val), nil
 	}
-	txt := fmt.Sprintf("%s", v)
-	return []byte(txt), nil
+	return fmt.Appendf(nil, "%v", v), nil
 }
 
 // RunCmd executes command and recovers from panics. If the error returns an

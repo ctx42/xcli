@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/ctx42/ring/pkg/ring/ringtest"
 	"github.com/ctx42/testing/pkg/assert"
@@ -42,6 +43,16 @@ func Test_Marshal(t *testing.T) {
 		}{
 			{"error", errors.New("msg"), "msg"},
 			{"Marshaler", TMarshaler("test"), "test"},
+			{
+				"TextMarshaler",
+				time.Date(2026, 1, 2, 3, 4, 5, 0, time.UTC),
+				"2026-01-02T03:04:05Z",
+			},
+			{"Stringer", time.Second, "1s"},
+			{"string", "abc", "abc"},
+			{"bytes", []byte("abc"), "abc"},
+			{"int", 42, "42"},
+			{"nil", nil, "<nil>"},
 		}
 
 		for _, tc := range tt {
