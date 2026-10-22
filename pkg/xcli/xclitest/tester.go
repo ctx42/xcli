@@ -5,6 +5,7 @@ package xclitest
 
 import (
 	"os"
+	"slices"
 	"time"
 
 	"github.com/ctx42/ring/pkg/ring"
@@ -16,7 +17,7 @@ import (
 
 // WithEnv is the [Tester] option setting the environment to use.
 func WithEnv(env []string) func(*options) {
-	return func(opts *options) { opts.env = env }
+	return func(opts *options) { opts.env = slices.Clone(env) }
 }
 
 // WithEnvKey is the [Tester] option setting the environment key to value.

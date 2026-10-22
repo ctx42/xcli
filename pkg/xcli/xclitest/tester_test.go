@@ -18,15 +18,33 @@ import (
 )
 
 func Test_WithEnv(t *testing.T) {
-	// --- Given ---
-	env := []string{"A=0", "B=1"}
-	def := &options{}
+	t.Run("set", func(t *testing.T) {
+		// --- Given ---
+		env := []string{"A=0", "B=1"}
+		def := &options{}
 
-	// --- When ---
-	WithEnv(env)(def)
+		// --- When ---
+		WithEnv(env)(def)
 
-	// --- Then ---
-	assert.Same(t, env, def.env)
+		// --- Then ---
+		assert.Equal(t, []string{"A=0", "B=1"}, def.env)
+		assert.NotSame(t, env, def.env)
+	})
+
+	t.Run("not aliased by WithEnvKey", func(t *testing.T) {
+		// --- Given ---
+		env := make([]string, 1, 2)
+		env[0] = "A=0"
+		def := &options{}
+		WithEnv(env)(def)
+
+		// --- When ---
+		WithEnvKey("B", "1")(def)
+
+		// --- Then ---
+		assert.Equal(t, []string{"A=0", "B=1"}, def.env)
+		assert.Equal(t, []string{"A=0", ""}, env[:2])
+	})
 }
 
 func Test_WithEnvKey(t *testing.T) {
