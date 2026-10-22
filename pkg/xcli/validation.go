@@ -7,6 +7,8 @@ import (
 	"fmt"
 )
 
+var _ Rule = RuleFunc(nil)
+
 // Rule represents a validation rule.
 type Rule interface {
 	// Validate validates a value and returns an error if validation fails.
