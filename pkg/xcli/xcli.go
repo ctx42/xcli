@@ -74,6 +74,9 @@ var (
 	// [Rule] does not allow.
 	ErrArgCount = xrr.New("wrong number of arguments", "ECArgCount")
 
+	// ErrParsed is returned when a command tree is parsed a second time.
+	ErrParsed = xrr.New("command arguments already parsed", "ECParsed")
+
 	// ErrNotParsed is returned when a command runs before its arguments were
 	// parsed with [Command.Parse].
 	ErrNotParsed = xrr.New("command arguments not parsed", "ECNotParsed")

@@ -215,7 +215,8 @@ func (cmd *Command) Args() []string {
 
 // Execute parses the ring arguments and runs the command they select with
 // [RunCmd]. It is the same as [Command.Parse] with [ring.Ring.Args] followed
-// by [RunCmd].
+// by [RunCmd], so a command tree executes once; executing it again returns
+// [ErrParsed].
 func (cmd *Command) Execute(ctx context.Context, rng *ring.Ring) error {
 	if err := cmd.Parse(rng.Args()...); err != nil {
 		return err
@@ -225,13 +226,18 @@ func (cmd *Command) Execute(ctx context.Context, rng *ring.Ring) error {
 
 // Parse parses arguments for the command and all subcommands and selects the
 // command [RunCmd] runs. Use it instead of [Command.Execute] to work with the
-// parsed command before running it.
+// parsed command before running it. A command tree parses once: parsing it
+// again returns [ErrParsed], because flags keep the values set by the first
+// parse.
 //
 // Example:
 //
 //	-a 1 sub-1 -s1a 2
 //	sub-1 -s1a 2
 func (cmd *Command) Parse(args ...string) error {
+	if cmd.flags.Parsed() {
+		return ErrParsed
+	}
 	cmd.args = args
 	found, err := cmd.parse(args)
 	if err != nil {

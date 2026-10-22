@@ -466,6 +466,19 @@ func Test_Command_Execute(t *testing.T) {
 		// --- Then ---
 		assert.ErrorIs(t, ErrTest, err)
 	})
+
+	t.Run("error - executed twice", func(t *testing.T) {
+		// --- Given ---
+		tst := ringtest.New(t)
+		root := NewCommand("root", xclitest.NopFunc)
+		assert.NoError(t, root.Execute(t.Context(), tst.Ring()))
+
+		// --- When ---
+		err := root.Execute(t.Context(), tst.Ring())
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrParsed, err)
+	})
 }
 
 func Test_Command_Parse(t *testing.T) {
@@ -598,6 +611,19 @@ func Test_Command_Parse(t *testing.T) {
 
 		// --- Then ---
 		assert.NoError(t, err)
+	})
+
+	t.Run("error - already parsed", func(t *testing.T) {
+		// --- Given ---
+		root := fixture.TstCmd()
+		assert.NoError(t, root.Parse())
+
+		// --- When ---
+		err := root.Parse("--root", "abc")
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrParsed, err)
+		assert.Equal(t, "root-def", root.Flags().GetString("root"))
 	})
 }
 
