@@ -92,7 +92,7 @@ func Test_New(t *testing.T) {
 
 		// --- Then ---
 		rng := tst.Ring()
-		assert.Equal(t, Sort(os.Environ()), Sort(rng.EnvAll()))
+		assert.Equal(t, sorted(os.Environ()), sorted(rng.EnvAll()))
 		assert.Equal(t, true, rng.MetaGet(xcli.MetaKeySOTerm))
 		assert.Equal(t, true, rng.MetaGet(xcli.MetaKeySETerm))
 		assert.Equal(t, false, rng.MetaGet(xcli.MetaKeyColor))
@@ -109,7 +109,7 @@ func Test_New(t *testing.T) {
 
 		// --- Then ---
 		rng := tst.Ring()
-		assert.Equal(t, []string{"A=B", "C=D"}, Sort(rng.EnvAll()))
+		assert.Equal(t, []string{"A=B", "C=D"}, sorted(rng.EnvAll()))
 	})
 
 	t.Run("not on terminal", func(t *testing.T) {
@@ -325,7 +325,7 @@ func Test_Tester_CmdAndCtx(t *testing.T) {
 		assert.Same(t, tst.Streams().Stdin(), ccx.Rng.Stdin())
 		assert.Same(t, tst.Streams().Stdout(), ccx.Rng.Stdout())
 		assert.Same(t, tst.Streams().Stderr(), ccx.Rng.Stderr())
-		assert.Equal(t, Sort(tst.Ring().EnvAll()), Sort(ccx.Rng.EnvAll()))
+		assert.Equal(t, sorted(tst.Ring().EnvAll()), sorted(ccx.Rng.EnvAll()))
 		assert.NotSame(t, tst.Ring().EnvAll(), ccx.Rng.EnvAll())
 	})
 

@@ -4,8 +4,8 @@
 package xclitest
 
 import (
-	"sort"
+	"slices"
 )
 
-// Sort sorts the passed slice and returns it.
-func Sort(in []string) []string { sort.Strings(in); return in }
+// sorted sorts the passed slice in place and returns it.
+func sorted(in []string) []string { slices.Sort(in); return in }
