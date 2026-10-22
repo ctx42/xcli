@@ -15,23 +15,23 @@ func NewMeta() Meta { return Meta{m: make(map[string]any, 10)} }
 // the variable is present in the metadata collection the value (which may be
 // empty or nil) is returned and the boolean is true. Otherwise, the returned
 // value will be nil and the boolean will be false.
-func (m Meta) MetaLookup(key string) (any, bool) {
-	val, ok := m.m[key]
+func (met Meta) MetaLookup(key string) (any, bool) {
+	val, ok := met.m[key]
 	return val, ok
 }
 
 // MetaGet returns the value of the metadata variable named by the key. If the
 // variable is not present in the metadata collection nil is returned.
-func (m Meta) MetaGet(key string) any { return m.m[key] }
+func (met Meta) MetaGet(key string) any { return met.m[key] }
 
 // MetaSet sets the value of metadata variable named by the key.
-func (m Meta) MetaSet(key string, value any) Meta {
-	m.m[key] = value
-	return m
+func (met Meta) MetaSet(key string, value any) Meta {
+	met.m[key] = value
+	return met
 }
 
 // MetaDelete deletes the metadata entry identified by the key.
-func (m Meta) MetaDelete(key string) { delete(m.m, key) }
+func (met Meta) MetaDelete(key string) { delete(met.m, key) }
 
 // MetaAll returns underlying map used for metadata collection.
-func (m Meta) MetaAll() map[string]any { return m.m }
+func (met Meta) MetaAll() map[string]any { return met.m }
