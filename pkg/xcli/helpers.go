@@ -38,9 +38,9 @@ func Marshal(v any) ([]byte, error) {
 	return fmt.Appendf(nil, "%v", v), nil
 }
 
-// RunCmd executes command and recovers from panics. If the error returns an
-// error, we always log it to the standard error and to the log configured in
-// [ring.Ring].
+// RunCmd executes command and recovers from panics. A recovered panic is
+// returned as an error. The context passed to the command is canceled on
+// SIGTERM.
 func RunCmd(ctx context.Context, rng *ring.Ring, cmd *Command) (err error) {
 	defer func() {
 		rec := recover()
