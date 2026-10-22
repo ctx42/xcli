@@ -804,6 +804,20 @@ func Test_Command_Run(t *testing.T) {
 		assert.Equal(t, []string{"arg0"}, root.Args())
 	})
 
+	t.Run("error - unknown subcommand", func(t *testing.T) {
+		// --- Given ---
+		tst := ringtest.New(t)
+		root := NewCommand("root", nil).Add(NewCommand("sub", nil))
+		assert.NoError(t, root.Parse("sbu"))
+
+		// --- When ---
+		err := root.Run(t.Context(), tst.Ring())
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrUnkCommand, err)
+		xrrtest.AssertEqual(t, "unknown command: `sbu`", err)
+	})
+
 	t.Run("error - not parsed", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)

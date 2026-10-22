@@ -270,6 +270,9 @@ func (cmd *Command) Run(ctx context.Context, rng *ring.Ring) (err error) {
 		_, _ = fmt.Fprint(rng.Stderr(), found.Help())
 		return nil
 	}
+	if found.fn == nil && len(found.subs) > 0 && len(found.args) > 0 {
+		return fmt.Errorf("%w: %#q", ErrUnkCommand, found.args[0])
+	}
 	if err = found.argsRule.Validate(ccx.Cmd.Args()); err != nil {
 		return fmt.Errorf("command %#q %w", found.Name(), err)
 	}
