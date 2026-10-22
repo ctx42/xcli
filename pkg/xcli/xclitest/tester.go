@@ -38,7 +38,7 @@ func WithClock(clk func() time.Time) func(*options) {
 // options represents [Tester] options.
 type options struct {
 	env   []string         // Program environment.
-	clock func() time.Time // Function returning current time in UTC.
+	clock func() time.Time // Function returning current time.
 	term  bool             // Is the program running on terminal? Default: true.
 	color bool             // Terminal colors allowed? Default: false.
 }
