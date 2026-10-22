@@ -414,7 +414,7 @@ func Test_Parse(t *testing.T) {
 		assert.Equal(t, []string{"arg0", "arg1"}, root.Args())
 	})
 
-	t.Run("unknown flag", func(t *testing.T) {
+	t.Run("error - unknown flag", func(t *testing.T) {
 		// --- Given ---
 		cmd := xclitest.TstCmd()
 
@@ -438,7 +438,7 @@ func Test_Parse(t *testing.T) {
 		assert.Equal(t, "abc", cmd.GetFlagSet("root").GetString("str"))
 	})
 
-	t.Run("subcommand parsing error", func(t *testing.T) {
+	t.Run("error - subcommand flag value", func(t *testing.T) {
 		// --- Given ---
 		root := xclitest.TstCmd()
 		args := []string{"sub-a", "--sa", "abc"}
@@ -451,7 +451,7 @@ func Test_Parse(t *testing.T) {
 		assert.ErrorEqual(t, want, err)
 	})
 
-	t.Run("required flag must be provided", func(t *testing.T) {
+	t.Run("error - required flag not set", func(t *testing.T) {
 		// --- Given ---
 		root := xclitest.TstCmdRequired()
 		args := []string{"sub-b", "sub-b-a"}
@@ -677,7 +677,7 @@ func Test_Command_Run(t *testing.T) {
 		assert.Empty(t, root.Args())
 	})
 
-	t.Run("arguments count error", func(t *testing.T) {
+	t.Run("error - arguments count", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
 		root := xclitest.TstCmd()
@@ -692,7 +692,7 @@ func Test_Command_Run(t *testing.T) {
 		assert.Equal(t, []string{"arg0"}, root.Args())
 	})
 
-	t.Run("Parse method must be executed before Run", func(t *testing.T) {
+	t.Run("error - not parsed", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
 		root := xclitest.TstCmd()
@@ -707,7 +707,7 @@ func Test_Command_Run(t *testing.T) {
 }
 
 func Test_Command_PreRun_RunPreRun(t *testing.T) {
-	t.Run("pre run error", func(t *testing.T) {
+	t.Run("error - pre run", func(t *testing.T) {
 		// --- Given ---
 		pre := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
 			return nil, ErrTest
@@ -728,7 +728,7 @@ func Test_Command_PreRun_RunPreRun(t *testing.T) {
 		assert.ErrorIs(t, ErrTest, err)
 	})
 
-	t.Run("stops at first error", func(t *testing.T) {
+	t.Run("error - stops at first failing pre run", func(t *testing.T) {
 		// --- Given ---
 		var pre0ran, pre1ran bool
 		pre0 := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
@@ -795,7 +795,7 @@ func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
 		assert.Empty(t, root.Args())
 	})
 
-	t.Run("run pre-run error", func(t *testing.T) {
+	t.Run("error - root pre run", func(t *testing.T) {
 		// --- Given ---
 		pre := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
 			return nil, ErrTest

@@ -222,7 +222,7 @@ func Test_Tester_Cmd(t *testing.T) {
 		assert.Equal(t, []string{"a", "b", "c"}, cmd.Args())
 	})
 
-	t.Run("failure", func(t *testing.T) {
+	t.Run("error - unknown flag", func(t *testing.T) {
 		// --- Given ---
 		tspy := tester.New(t)
 		tspy.ExpectCleanups(2)
@@ -283,7 +283,7 @@ func Test_Tester_Ctx(t *testing.T) {
 		assert.True(t, cmd.GetBool("abc"))
 	})
 
-	t.Run("parse error", func(t *testing.T) {
+	t.Run("error - parse", func(t *testing.T) {
 		// --- Given ---
 		tspy := tester.New(t)
 		tspy.ExpectCleanups(2)

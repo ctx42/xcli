@@ -66,7 +66,7 @@ func Test_Marshal(t *testing.T) {
 		}
 	})
 
-	t.Run("error", func(t *testing.T) {
+	t.Run("error - marshaler", func(t *testing.T) {
 		// --- Given ---
 		v := TErrMarshaler("test")
 
@@ -93,7 +93,7 @@ func Test_RunCmd(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("run returns error", func(t *testing.T) {
+	t.Run("error - run", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
 		fn := func(_ context.Context, _ *CmdCtx) error {
@@ -109,7 +109,7 @@ func Test_RunCmd(t *testing.T) {
 		assert.ErrorEqual(t, "returns error", err)
 	})
 
-	t.Run("run panics with string", func(t *testing.T) {
+	t.Run("error - panic with string", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
 		fn := func(_ context.Context, _ *CmdCtx) error {
@@ -125,7 +125,7 @@ func Test_RunCmd(t *testing.T) {
 		assert.ErrorEqual(t, "panics with string", err)
 	})
 
-	t.Run("run panics with error", func(t *testing.T) {
+	t.Run("error - panic with error", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
 		fn := func(_ context.Context, _ *CmdCtx) error {
@@ -141,7 +141,7 @@ func Test_RunCmd(t *testing.T) {
 		assert.ErrorEqual(t, "panics with error", err)
 	})
 
-	t.Run("run panics with Stringer", func(t *testing.T) {
+	t.Run("error - panic with Stringer", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
 		fn := func(_ context.Context, _ *CmdCtx) error {
@@ -159,7 +159,7 @@ func Test_RunCmd(t *testing.T) {
 		assert.ErrorEqual(t, "panics with Stringer", err)
 	})
 
-	t.Run("run panics with unsupported type", func(t *testing.T) {
+	t.Run("error - panic with unsupported type", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t)
 		fn := func(_ context.Context, _ *CmdCtx) error { panic(123) }
