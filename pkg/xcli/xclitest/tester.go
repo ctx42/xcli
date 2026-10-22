@@ -107,7 +107,8 @@ func (tst *Tester) Cmd(
 }
 
 // Ctx returns command context with the given command and [ring.Ring] based on
-// [Tester] fields.
+// [Tester] fields. It parses the command with args unless it is already
+// parsed, in which case args are ignored.
 func (tst *Tester) Ctx(cmd *xcli.Command, args ...string) *xcli.CmdCtx {
 	tst.t.Helper()
 	if !cmd.Parsed() {
