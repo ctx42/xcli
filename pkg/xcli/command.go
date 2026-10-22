@@ -225,17 +225,23 @@ func (cmd *Command) parse(args []string) (*Command, error) {
 	return cmd, nil
 }
 
-// Find finds command by its path.
+// Find finds command by its path. The path may start with the name of the
+// command itself; the remaining names are matched against subcommands.
 func (cmd *Command) Find(path ...string) *Command {
+	if len(path) > 0 && path[0] == cmd.Name() {
+		path = path[1:]
+	}
+	return cmd.find(path)
+}
+
+// find finds the subcommand by its path relative to the command.
+func (cmd *Command) find(path []string) *Command {
 	if len(path) == 0 {
 		return cmd
 	}
-	if path[0] == cmd.Name() {
-		return cmd.Find(path[1:]...)
-	}
 	for _, sub := range cmd.subs {
 		if sub.Name() == path[0] {
-			return sub.Find(path[1:]...)
+			return sub.find(path[1:])
 		}
 	}
 	return nil

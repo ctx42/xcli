@@ -302,6 +302,29 @@ func Test_Command_Find(t *testing.T) {
 		// --- Then ---
 		assert.Nil(t, have)
 	})
+
+	t.Run("subcommand named like its parent", func(t *testing.T) {
+		// --- Given ---
+		sub := NewCommand("cmd", nil)
+		root := NewCommand("cmd", nil).Add(sub)
+
+		// --- When ---
+		have := root.Find("cmd", "cmd")
+
+		// --- Then ---
+		assert.Same(t, sub, have)
+	})
+
+	t.Run("root name repeated", func(t *testing.T) {
+		// --- Given ---
+		root := xclitest.TstCmd()
+
+		// --- When ---
+		have := root.Find("root", "root")
+
+		// --- Then ---
+		assert.Nil(t, have)
+	})
 }
 
 func Test_Parse(t *testing.T) {
