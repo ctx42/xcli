@@ -313,7 +313,7 @@ func (cmd *Command) run(ctx context.Context, rng *ring.Ring) (err error) {
 			found.flags.Usage()
 			return nil
 		}
-		_, _ = fmt.Fprint(rng.Stderr(), found.Help())
+		_, _ = fmt.Fprint(rng.Stdout(), found.Help())
 		return nil
 	}
 	if found.fn == nil && len(found.subs) > 0 && len(found.args) > 0 {

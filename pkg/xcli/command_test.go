@@ -293,7 +293,7 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 
 	t.Run("true when parent command help requested", func(t *testing.T) {
 		// --- Given ---
-		tst := ringtest.New(t).WetStderr()
+		tst := ringtest.New(t).WetStdout()
 
 		sub := NewCommand("sub", xclitest.DbgFunc).
 			UsageFlagName("help")
@@ -317,7 +317,7 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 			"\n" +
 			"OPTIONS:\n" +
 			"      --help    sub-desc\n"
-		assert.Equal(t, want, tst.Stderr())
+		assert.Equal(t, want, tst.Stdout())
 		assert.Empty(t, root.Args())
 	})
 }
@@ -431,7 +431,7 @@ func Test_Command_Execute(t *testing.T) {
 
 	t.Run("help requested", func(t *testing.T) {
 		// --- Given ---
-		tst := ringtest.New(t).WetStderr()
+		tst := ringtest.New(t).WetStdout()
 		root := NewCommand("root", xclitest.DbgFunc)
 
 		// --- When ---
@@ -439,7 +439,7 @@ func Test_Command_Execute(t *testing.T) {
 
 		// --- Then ---
 		assert.NoError(t, err)
-		assert.Equal(t, "Usage of `root`:\n", tst.Stderr())
+		assert.Equal(t, "Usage of `root`:\n", tst.Stdout())
 	})
 
 	t.Run("error - parse", func(t *testing.T) {
@@ -900,7 +900,7 @@ func Test_Command_Run(t *testing.T) {
 
 	t.Run("show help for subcommand", func(t *testing.T) {
 		// --- Given ---
-		tst := ringtest.New(t).WetStderr()
+		tst := ringtest.New(t).WetStdout()
 		root := fixture.TstCmd()
 		assert.NoError(t, root.Parse("sub-b", "-h"))
 
@@ -919,13 +919,13 @@ func Test_Command_Run(t *testing.T) {
 			"\n" +
 			"COMMANDS:\n" +
 			"  sub-b-a       subcommand BA\n"
-		assert.Equal(t, want, tst.Stderr())
+		assert.Equal(t, want, tst.Stdout())
 		assert.Empty(t, root.Args())
 	})
 
 	t.Run("show help when help flag not defined", func(t *testing.T) {
 		// --- Given ---
-		tst := ringtest.New(t).WetStderr()
+		tst := ringtest.New(t).WetStdout()
 		root := NewCommand("root", xclitest.DbgFunc)
 		assert.NoError(t, root.Parse("--help"))
 
@@ -934,12 +934,12 @@ func Test_Command_Run(t *testing.T) {
 
 		// --- Then ---
 		assert.NoError(t, err)
-		assert.Equal(t, "Usage of `root`:\n", tst.Stderr())
+		assert.Equal(t, "Usage of `root`:\n", tst.Stdout())
 	})
 
 	t.Run("help before subcommand with required flag", func(t *testing.T) {
 		// --- Given ---
-		tst := ringtest.New(t).WetStderr()
+		tst := ringtest.New(t).WetStdout()
 		root := fixture.TstCmdRequired()
 		assert.NoError(t, root.Parse("sub-b", "-h", "sub-b-a"))
 
@@ -955,7 +955,7 @@ func Test_Command_Run(t *testing.T) {
 			"OPTIONS:\n" +
 			"  -h, --help    sub-b-a-help\n" +
 			"      --sba     sba-help\n"
-		assert.Equal(t, want, tst.Stderr())
+		assert.Equal(t, want, tst.Stdout())
 		assert.Empty(t, root.Args())
 	})
 

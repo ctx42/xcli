@@ -79,7 +79,7 @@ if err := cmd.Execute(context.Background(), rng); err != nil {
 ```
 
 `UsageFlagName` tells the command which flag requests help. On `-h` or
-`--help`, `Execute` prints the help to the standard error of the ring
+`--help`, `Execute` prints the help to the standard output of the ring
 instead of running the command function. The same text comes from `Help`:
 
 <!-- gmmce:pkg/xcli/ExampleCommand_Help -->
@@ -90,7 +90,7 @@ cmd := xcli.NewCommand("hello", nil).
 cmd.Flags().BoolSL("help", "h", false, "show help")
 cmd.Flags().StringSL("name", "n", "World", "who to greet")
 
-// Execute prints the same text to standard error on -h or --help.
+// Execute prints the same text to standard output on -h or --help.
 fmt.Print(cmd.Help())
 // Output:
 // Usage of `hello`:

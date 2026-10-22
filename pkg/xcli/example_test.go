@@ -42,7 +42,7 @@ func ExampleCommand_Help() {
 	cmd.Flags().BoolSL("help", "h", false, "show help")
 	cmd.Flags().StringSL("name", "n", "World", "who to greet")
 
-	// Execute prints the same text to standard error on -h or --help.
+	// Execute prints the same text to standard output on -h or --help.
 	fmt.Print(cmd.Help())
 	// Output:
 	// Usage of `hello`:
