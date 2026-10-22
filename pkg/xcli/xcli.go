@@ -7,9 +7,8 @@
 // set, an optional [Func] holding its logic, and subcommands added with
 // [Command.Add]. [Command.Execute] parses the arguments, finds the command to
 // run, and runs it after the [PreRun] functions of the commands from the root
-// down to it. Commands reach the program environment
-// and streams through the [github.com/ctx42/ring/pkg/ring.Ring] in their
-// [CmdCtx].
+// down to it. Commands reach the program environment and streams through the
+// [github.com/ctx42/ring/pkg/ring.Ring] in their [CmdCtx].
 //
 //	sub := xcli.NewCommand("version", versionFunc).
 //		ShortDesc("print the version")
