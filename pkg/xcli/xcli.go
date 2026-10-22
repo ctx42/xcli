@@ -60,11 +60,13 @@ var (
 	// ErrUnkCommand is returned when the requested command is unknown.
 	ErrUnkCommand = xrr.New("unknown command", "ECUnkCommand")
 
-	// ErrReqMeta is returned when required command metadata is missing.
+	// ErrReqMeta is for command code to return when required command metadata
+	// is missing; the xcli package itself never returns it.
 	ErrReqMeta = xrr.New("required command metadata key", "ECCmdReqMeta")
 
-	// ErrInvMeta is returned when command metadata is invalid because of its
-	// type, format or value.
+	// ErrInvMeta is for command code to return when command metadata is
+	// invalid because of its type, format or value; the xcli package itself
+	// never returns it.
 	ErrInvMeta = xrr.New("invalid command metadata key", "ECCmdInvMeta")
 
 	// ErrInvArgType is returned when the command arguments passed to a rule
