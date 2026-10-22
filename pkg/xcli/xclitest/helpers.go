@@ -106,7 +106,7 @@ func TstCmdRequired() *xcli.Command {
 		ArgsRule(xcli.ArgsRule(0)).
 		UsageFlagName("help")
 	subBA.String("sba", "sba-def", "sba-help")
-	helpFlg(subBA, "sub-a-help")
+	helpFlg(subBA, "sub-b-a-help")
 
 	subB := xcli.NewCommand("sub-b", DbgFunc).
 		ShortDesc("subcommand B").

@@ -783,7 +783,7 @@ func Test_Command_Run(t *testing.T) {
 			"  subcommand BA\n" +
 			"                \n" +
 			"OPTIONS:        \n" +
-			"  -h, --help    sub-a-help\n" +
+			"  -h, --help    sub-b-a-help\n" +
 			"      --sba     sba-help\n"
 		assert.Equal(t, want, tst.Stderr())
 		assert.Empty(t, root.Args())
