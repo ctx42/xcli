@@ -568,7 +568,7 @@ func Test_Command_PreRun_RunPreRun(t *testing.T) {
 }
 
 func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
-	t.Run("all commands in the chain have run pre-run", func(t *testing.T) {
+	t.Run("pre-run of every command in chain", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStderr()
 		root := xclitest.TstCmdPreRun()
@@ -585,7 +585,7 @@ func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
 		assert.Empty(t, root.Args())
 	})
 
-	t.Run("some commands in the chain have run pre-run", func(t *testing.T) {
+	t.Run("pre-run of some commands in chain", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStderr()
 		root := xclitest.TstCmdPreRun()
@@ -685,7 +685,7 @@ func Test_Command_Run(t *testing.T) {
 		assert.Equal(t, []string{"arg0", "arg1"}, root.Args())
 	})
 
-	t.Run("run first level subcommand flag and arguments", func(t *testing.T) {
+	t.Run("subcommand flag and arguments", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStdout()
 		root := xclitest.TstCmd()
@@ -764,7 +764,7 @@ func Test_Command_Run(t *testing.T) {
 		assert.Equal(t, "Usage of `root`:\n", tst.Stderr())
 	})
 
-	t.Run("show help requested before subcommand with required flag", func(t *testing.T) {
+	t.Run("help before subcommand with required flag", func(t *testing.T) {
 		// --- Given ---
 		tst := ringtest.New(t).WetStderr()
 		root := xclitest.TstCmdRequired()
