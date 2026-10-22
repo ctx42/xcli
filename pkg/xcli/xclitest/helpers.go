@@ -50,7 +50,7 @@ func TstCmd() *xcli.Command {
 	subBA := xcli.NewCommand("sub-b-a", DbgFunc).
 		ShortDesc("subcommand BA")
 	subBA.String("sba", "sba-def", "sba-help")
-	helpFlg(subBA, "sub-b-help")
+	helpFlg(subBA, "sub-b-a-help")
 
 	subB := xcli.NewCommand("sub-b", DbgFunc).
 		ShortDesc("subcommand B").
