@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"reflect"
 	"syscall"
 
 	"github.com/ctx42/ring/pkg/ring"
@@ -24,16 +25,18 @@ func defaultFunc(_ context.Context, ccx *CmdCtx) error {
 // Marshal marshals v to a byte slice suitable for display on the CLI.
 //
 // It uses the [Marshaler] or [encoding.TextMarshaler] implementation of v, in
-// that order. Otherwise, a byte slice is returned as text and any other value
-// is formatted with the %v verb.
+// that order. Otherwise, a byte slice of any named type is returned as text
+// and any other value is formatted with the %v verb.
 func Marshal(v any) ([]byte, error) {
 	switch val := v.(type) {
 	case Marshaler:
 		return val.MarshalCLI()
 	case encoding.TextMarshaler:
 		return val.MarshalText()
-	case []byte:
-		return fmt.Appendf(nil, "%s", val), nil
+	}
+	rv := reflect.ValueOf(v)
+	if rv.Kind() == reflect.Slice && rv.Type().Elem().Kind() == reflect.Uint8 {
+		return fmt.Appendf(nil, "%s", v), nil
 	}
 	return fmt.Appendf(nil, "%v", v), nil
 }

@@ -5,6 +5,7 @@ package xcli_test
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"strings"
 	"testing"
@@ -63,6 +64,7 @@ func Test_Marshal_tabular(t *testing.T) {
 		{"Stringer", time.Second, "1s"},
 		{"string", "abc", "abc"},
 		{"bytes", []byte("abc"), "abc"},
+		{"named bytes", json.RawMessage(`{"a":1}`), `{"a":1}`},
 		{"int", 42, "42"},
 		{"nil", nil, "<nil>"},
 	}
