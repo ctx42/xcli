@@ -17,9 +17,9 @@ import (
 	"github.com/ctx42/xflag/pkg/xflag"
 )
 
-// PreRun is signature for functions which can run before a command. It takes
-// context, the [Command] instance and returns potentially modified context and
-// error. The caller must use the returned context in case it was modified.
+// PreRun is the signature of functions run before a command. It takes the
+// context and the command context, and returns a potentially modified context
+// and an error. The caller must use the returned context.
 type PreRun func(ctx context.Context, ccx *CmdCtx) (context.Context, error)
 
 // WithFlags is option for [NewCommand] setting flag set to use instead of
@@ -79,8 +79,7 @@ type Command struct {
 	// Usage examples and their descriptions.
 	examples [][2]string
 
-	// Only send on root command when by Parse. This indicates which command
-	// should be run by Run.
+	// Set on the root command by Parse to the command Run runs.
 	found *Command
 }
 
@@ -124,7 +123,7 @@ func (cmd *Command) setMeta(meta Meta) {
 	}
 }
 
-// UsageFlagName lets command know what is the name of the help (usage) flag.
+// UsageFlagName sets the name of the help (usage) flag.
 func (cmd *Command) UsageFlagName(name string) *Command {
 	cmd.usageFlag = name
 	return cmd
@@ -141,7 +140,7 @@ func (cmd *Command) ShouldRunUsage() bool {
 	return cmd.GetBool(cmd.usageFlag)
 }
 
-// ShortDesc sets shot description for the command.
+// ShortDesc sets short description for the command.
 func (cmd *Command) ShortDesc(desc string) *Command {
 	cmd.shortDesc = desc
 	return cmd
@@ -223,7 +222,7 @@ func (cmd *Command) parse(args []string) (*Command, error) {
 		return sub.parse(cmd.args[1:])
 	}
 
-	// When we are here there are arguments are for the current command.
+	// The remaining arguments are for the current command.
 	return cmd, nil
 }
 
@@ -379,7 +378,7 @@ func (cmd *Command) FullName() string {
 	return name
 }
 
-// Help reruns command's help string.
+// Help returns the command's help string.
 func (cmd *Command) Help() string {
 	var buf strings.Builder
 	header := fmt.Sprintf("Usage of %#q:\n", cmd.FullName())

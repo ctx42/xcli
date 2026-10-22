@@ -35,7 +35,7 @@ func WithClock(clk func() time.Time) func(*options) {
 	return func(opts *options) { opts.clock = clk }
 }
 
-// options represent [Tester] options
+// options represents [Tester] options.
 type options struct {
 	env   []string         // Program environment.
 	clock func() time.Time // Function returning current time in UTC.

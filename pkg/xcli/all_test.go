@@ -15,7 +15,7 @@ var (
 	DefaultFunc = defaultFunc
 )
 
-// Describe is exporting [Command.describe] for testing.
+// Describe exports the describe method of [Command] for testing.
 func (cmd *Command) Describe() string { return cmd.describe() }
 
 // TMarshaler is a simple type implementing Marshaler interface.

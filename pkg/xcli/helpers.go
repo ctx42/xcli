@@ -16,7 +16,7 @@ import (
 	"github.com/mattn/go-isatty"
 )
 
-// defaultFunc is default [Func] if none provided.
+// defaultFunc is the [Func] used when none is provided.
 func defaultFunc(_ context.Context, ccx *CmdCtx) error {
 	return fmt.Errorf("%w for %#q", ErrNoDefault, ccx.Cmd.Name())
 }

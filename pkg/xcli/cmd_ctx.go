@@ -13,7 +13,7 @@ type CmdCtx struct {
 	Cmd *Command   // The command being run.
 }
 
-// NewCmdCtx reruns a new instance of command context.
+// NewCmdCtx returns a new instance of command context.
 func NewCmdCtx(rng *ring.Ring, cmd *Command) *CmdCtx {
 	return &CmdCtx{Rng: rng, Cmd: cmd}
 }

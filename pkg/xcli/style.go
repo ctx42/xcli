@@ -11,10 +11,10 @@ import (
 
 // Style represents predefined CLI styles.
 type Style struct {
-	Base    lipgloss.Style // Represents base style.
-	Header  lipgloss.Style // Represents a CLI style for headers.
-	Section lipgloss.Style // Represents a CLI style for section headers.
-	Error   lipgloss.Style // Represents CLI style for error message.
+	Base    lipgloss.Style // Plain style the others derive from.
+	Header  lipgloss.Style // Bold, near-white.
+	Section lipgloss.Style // Bold, underlined, near-white.
+	Error   lipgloss.Style // Bold red.
 }
 
 // NewStyle returns new CLI styles based on output buffer.
