@@ -363,7 +363,7 @@ func Test_Tester_Func(t *testing.T) {
 
 	// --- Then ---
 	assert.NotNil(t, fn)
-	assert.NoError(t, fn(nil, cmx))
+	assert.NoError(t, fn(t.Context(), cmx))
 	want := "command `name` with args [a b c]"
 	assert.Equal(t, want, tst.Stdout())
 }
@@ -382,6 +382,6 @@ func Test_Tester_NopFunc(t *testing.T) {
 
 	// --- Then ---
 	assert.NotNil(t, fn)
-	assert.NoError(t, fn(nil, cmx))
+	assert.NoError(t, fn(t.Context(), cmx))
 	assert.Equal(t, "", tst.Stderr())
 }

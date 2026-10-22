@@ -33,7 +33,6 @@ func Test_WithFlags(t *testing.T) {
 func Test_NewCommand(t *testing.T) {
 	t.Run("with Function", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := xclitest.New(t).WetStdout()
 
 		// --- When ---
@@ -41,13 +40,12 @@ func Test_NewCommand(t *testing.T) {
 
 		// --- Then ---
 		assert.NoError(t, cmd.Parse())
-		assert.NoError(t, cmd.Run(ctx, tst.Ring()))
+		assert.NoError(t, cmd.Run(t.Context(), tst.Ring()))
 		assert.Equal(t, "command `root` with args []", tst.Stdout())
 	})
 
 	t.Run("command without function", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := xclitest.New(t)
 
 		// --- When ---
@@ -56,14 +54,13 @@ func Test_NewCommand(t *testing.T) {
 		// --- Then ---
 		assert.NoError(t, cmd.Parse())
 
-		err := cmd.Run(ctx, tst.Ring())
+		err := cmd.Run(t.Context(), tst.Ring())
 		assert.ErrorIs(t, ErrNoDefault, err)
 		xrrtest.AssertEqual(t, "default command not defined for `root`", err)
 	})
 
 	t.Run("command requires subcommand to be defined", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := xclitest.New(t)
 
 		// --- When ---
@@ -73,7 +70,7 @@ func Test_NewCommand(t *testing.T) {
 		// --- Then ---
 		assert.NoError(t, root.Parse())
 
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 		assert.ErrorIs(t, ErrSubCmdReq, err)
 		xrrtest.AssertEqual(t, "subcommand required for `root`", err)
 	})
@@ -199,7 +196,6 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 
 	t.Run("true when parent command help requested", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t).WetStderr()
 
 		sub := NewCommand("sub", xclitest.DbgFunc).
@@ -217,7 +213,7 @@ func Test_Command_ShouldRunUsage(t *testing.T) {
 
 		// --- Then ---
 		assert.True(t, have)
-		assert.NoError(t, root.Run(ctx, tst.Ring()))
+		assert.NoError(t, root.Run(t.Context(), tst.Ring()))
 
 		want := "" +
 			"Usage of `root sub`:\n" +
@@ -280,7 +276,7 @@ func Test_Command_ArgsRule(t *testing.T) {
 	cmd.ArgsRule(MinArgsRule(3))
 
 	// --- When ---
-	err := cmd.Run(context.Background(), tst.Ring())
+	err := cmd.Run(t.Context(), tst.Ring())
 
 	// --- Then ---
 	want := "command `root` requires minimum 3 arguments 2 given"
@@ -520,13 +516,12 @@ func Test_Parse(t *testing.T) {
 func Test_Command_Run(t *testing.T) {
 	t.Run("run root without arguments", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t).WetStdout()
 		root := xclitest.TstCmd()
 		assert.NoError(t, root.Parse())
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -541,13 +536,12 @@ func Test_Command_Run(t *testing.T) {
 
 	t.Run("run root with flag", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t).WetStdout()
 		root := xclitest.TstCmd()
 		assert.NoError(t, root.Parse("--root", "abc"))
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -563,13 +557,12 @@ func Test_Command_Run(t *testing.T) {
 
 	t.Run("run first level subcommand flag", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t).WetStdout()
 		root := xclitest.TstCmd()
 		assert.NoError(t, root.Parse("sub-b", "--sb", "abc", "arg0", "arg1"))
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -585,14 +578,13 @@ func Test_Command_Run(t *testing.T) {
 
 	t.Run("run first level subcommand flag and arguments", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t).WetStdout()
 		root := xclitest.TstCmd()
 		args := []string{"sub-b", "--sb", "abc", "arg0", "arg1"}
 		assert.NoError(t, root.Parse(args...))
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -608,7 +600,6 @@ func Test_Command_Run(t *testing.T) {
 
 	t.Run("run usage", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t)
 		root := xclitest.TstCmd()
 		assert.NoError(t, root.Parse("--help"))
@@ -617,7 +608,7 @@ func Test_Command_Run(t *testing.T) {
 		root.Usage = func() { usageRan = true }
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -627,13 +618,12 @@ func Test_Command_Run(t *testing.T) {
 
 	t.Run("show help for subcommand", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t).WetStderr()
 		root := xclitest.TstCmd()
 		assert.NoError(t, root.Parse("sub-b", "-h"))
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -667,13 +657,12 @@ func Test_Command_Run(t *testing.T) {
 
 	t.Run("show help requested before subcommand with required flag", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t).WetStderr()
 		root := xclitest.TstCmdRequired()
 		assert.NoError(t, root.Parse("sub-b", "-h", "sub-b-a"))
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -690,13 +679,12 @@ func Test_Command_Run(t *testing.T) {
 
 	t.Run("arguments count error", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t)
 		root := xclitest.TstCmd()
 		assert.NoError(t, root.Parse("sub-a", "--sa", "44", "arg0"))
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		want := "command `sub-a` requires no arguments 1 given"
@@ -706,12 +694,11 @@ func Test_Command_Run(t *testing.T) {
 
 	t.Run("Parse method must be executed before Run", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t)
 		root := xclitest.TstCmd()
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		want := "not parsed arguments"
@@ -722,7 +709,6 @@ func Test_Command_Run(t *testing.T) {
 func Test_Command_PreRun_RunPreRun(t *testing.T) {
 	t.Run("pre run error", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		pre := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
 			return nil, ErrTest
 		}
@@ -735,7 +721,7 @@ func Test_Command_PreRun_RunPreRun(t *testing.T) {
 		assert.Same(t, cmd, have)
 
 		// --- When ---
-		haveCtx, err := RunPreRun(ctx, ccx)
+		haveCtx, err := RunPreRun(t.Context(), ccx)
 
 		// --- Then ---
 		assert.Nil(t, haveCtx)
@@ -744,8 +730,6 @@ func Test_Command_PreRun_RunPreRun(t *testing.T) {
 
 	t.Run("stops at first error", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
-
 		var pre0ran, pre1ran bool
 		pre0 := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
 			pre0ran = true
@@ -766,7 +750,7 @@ func Test_Command_PreRun_RunPreRun(t *testing.T) {
 		assert.Same(t, cmd, have)
 
 		// --- When ---
-		haveCtx, err := RunPreRun(ctx, ccx)
+		haveCtx, err := RunPreRun(t.Context(), ccx)
 
 		// --- Then ---
 		assert.Nil(t, haveCtx)
@@ -779,14 +763,13 @@ func Test_Command_PreRun_RunPreRun(t *testing.T) {
 func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
 	t.Run("all commands in the chain have run pre-run", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t).WetStderr()
 		root := xclitest.TstCmdPreRun()
 		root.MetaSet("my", 1)
 		assert.NoError(t, root.Parse("sub-b", "sub-b-a"))
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -797,14 +780,13 @@ func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
 
 	t.Run("some commands in the chain have run pre-run", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t).WetStderr()
 		root := xclitest.TstCmdPreRun()
 		root.MetaSet("my", 1)
 		assert.NoError(t, root.Parse("sub-a", "sub-a-a"))
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -819,14 +801,13 @@ func Test_Command_PreRun_Run_RunPreRun(t *testing.T) {
 			return nil, ErrTest
 		}
 
-		ctx := context.Background()
 		tst := ringtest.New(t)
 		root := xclitest.TstCmdPreRun().PreRun(pre)
 		root.MetaSet("my", 1)
 		assert.NoError(t, root.Parse("sub-a", "sub-a-a"))
 
 		// --- When ---
-		err := root.Run(ctx, tst.Ring())
+		err := root.Run(t.Context(), tst.Ring())
 
 		// --- Then ---
 		assert.ErrorIs(t, ErrTest, err)

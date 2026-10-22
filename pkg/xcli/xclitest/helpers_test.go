@@ -14,7 +14,6 @@ import (
 
 func Test_DbgFunc(t *testing.T) {
 	// --- Given ---
-	ctx := context.Background()
 	var called bool
 	fn := func(ctx context.Context, ccx *xcli.CmdCtx) error {
 		called = true
@@ -24,7 +23,7 @@ func Test_DbgFunc(t *testing.T) {
 	_, ccx := tst.CmdAndCtx("name", fn, "arg0", "arg1")
 
 	// --- When ---
-	err := DbgFunc(ctx, ccx)
+	err := DbgFunc(t.Context(), ccx)
 
 	// --- Then ---
 	assert.NoError(t, err)
@@ -38,7 +37,7 @@ func Test_NopFunc(t *testing.T) {
 	var err error
 
 	// --- When ---
-	assert.NoPanic(t, func() { err = NopFunc(nil, &xcli.CmdCtx{}) })
+	assert.NoPanic(t, func() { err = NopFunc(t.Context(), &xcli.CmdCtx{}) })
 
 	// --- Then ---
 	assert.NoError(t, err)

@@ -25,7 +25,7 @@ func Test_defaultFunc(t *testing.T) {
 	_, ccx := xclitest.New(t).CmdAndCtx("name", xclitest.NopFunc)
 
 	// --- When ---
-	err := DefaultFunc(nil, ccx)
+	err := DefaultFunc(t.Context(), ccx)
 
 	// --- Then ---
 	assert.ErrorIs(t, ErrNoDefault, err)
@@ -82,13 +82,12 @@ func Test_Marshal(t *testing.T) {
 func Test_RunCmd(t *testing.T) {
 	t.Run("success", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t)
 		cmd := NewCommand("root", xclitest.NopFunc)
 		assert.NoError(t, cmd.Parse())
 
 		// --- When ---
-		err := RunCmd(ctx, tst.Ring(), cmd)
+		err := RunCmd(t.Context(), tst.Ring(), cmd)
 
 		// --- Then ---
 		assert.NoError(t, err)
@@ -96,7 +95,6 @@ func Test_RunCmd(t *testing.T) {
 
 	t.Run("run returns error", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t)
 		fn := func(_ context.Context, _ *CmdCtx) error {
 			return errors.New("returns error")
@@ -105,7 +103,7 @@ func Test_RunCmd(t *testing.T) {
 		assert.NoError(t, cmd.Parse())
 
 		// --- When ---
-		err := RunCmd(ctx, tst.Ring(), cmd)
+		err := RunCmd(t.Context(), tst.Ring(), cmd)
 
 		// --- Then ---
 		assert.ErrorEqual(t, "returns error", err)
@@ -113,7 +111,6 @@ func Test_RunCmd(t *testing.T) {
 
 	t.Run("run panics with string", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t)
 		fn := func(_ context.Context, _ *CmdCtx) error {
 			panic("panics with string")
@@ -122,7 +119,7 @@ func Test_RunCmd(t *testing.T) {
 		assert.NoError(t, cmd.Parse())
 
 		// --- When ---
-		err := RunCmd(ctx, tst.Ring(), cmd)
+		err := RunCmd(t.Context(), tst.Ring(), cmd)
 
 		// --- Then ---
 		assert.ErrorEqual(t, "panics with string", err)
@@ -130,7 +127,6 @@ func Test_RunCmd(t *testing.T) {
 
 	t.Run("run panics with error", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t)
 		fn := func(_ context.Context, _ *CmdCtx) error {
 			panic(errors.New("panics with error"))
@@ -139,7 +135,7 @@ func Test_RunCmd(t *testing.T) {
 		assert.NoError(t, cmd.Parse())
 
 		// --- When ---
-		err := RunCmd(ctx, tst.Ring(), cmd)
+		err := RunCmd(t.Context(), tst.Ring(), cmd)
 
 		// --- Then ---
 		assert.ErrorEqual(t, "panics with error", err)
@@ -147,7 +143,6 @@ func Test_RunCmd(t *testing.T) {
 
 	t.Run("run panics with Stringer", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t)
 		fn := func(_ context.Context, _ *CmdCtx) error {
 			buf := &strings.Builder{}
@@ -158,7 +153,7 @@ func Test_RunCmd(t *testing.T) {
 		assert.NoError(t, cmd.Parse())
 
 		// --- When ---
-		err := RunCmd(ctx, tst.Ring(), cmd)
+		err := RunCmd(t.Context(), tst.Ring(), cmd)
 
 		// --- Then ---
 		assert.ErrorEqual(t, "panics with Stringer", err)
@@ -166,14 +161,13 @@ func Test_RunCmd(t *testing.T) {
 
 	t.Run("run panics with unsupported type", func(t *testing.T) {
 		// --- Given ---
-		ctx := context.Background()
 		tst := ringtest.New(t)
 		fn := func(_ context.Context, _ *CmdCtx) error { panic(123) }
 		cmd := NewCommand("root", fn)
 		assert.NoError(t, cmd.Parse())
 
 		// --- When ---
-		err := RunCmd(ctx, tst.Ring(), cmd)
+		err := RunCmd(t.Context(), tst.Ring(), cmd)
 
 		// --- Then ---
 		assert.ErrorEqual(t, "do not know how to handle `int` panics", err)
