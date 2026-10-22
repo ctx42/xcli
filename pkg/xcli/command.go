@@ -40,7 +40,7 @@ func WithFlags(fs *xflag.FlagSet) func(*Command) {
 // The zero value is not usable. Use [NewCommand] to create a command.
 type Command struct {
 	// Metadata shared by all commands in the tree.
-	meta Meta
+	meta map[string]any
 
 	// Command flags.
 	flags *xflag.FlagSet
@@ -85,7 +85,7 @@ type Command struct {
 // NewCommand instantiates new command.
 func NewCommand(name string, fn Func, opts ...func(*Command)) *Command {
 	cmd := &Command{
-		meta:     NewMeta(),
+		meta:     make(map[string]any),
 		argsRule: ArgsRule(0),
 		fn:       fn,
 	}
@@ -113,28 +113,29 @@ func (cmd *Command) Flags() *xflag.FlagSet { return cmd.flags }
 // true, or nil and false when the variable is not set. The metadata is shared
 // by all commands in the tree.
 func (cmd *Command) MetaLookup(key string) (any, bool) {
-	return cmd.meta.MetaLookup(key)
+	val, ok := cmd.meta[key]
+	return val, ok
 }
 
 // MetaGet returns the value of the metadata variable named by the key, or nil
 // when the variable is not set. The metadata is shared by all commands in the
 // tree.
-func (cmd *Command) MetaGet(key string) any { return cmd.meta.MetaGet(key) }
+func (cmd *Command) MetaGet(key string) any { return cmd.meta[key] }
 
 // MetaSet sets the value of the metadata variable named by the key. The
 // metadata is shared by all commands in the tree.
 func (cmd *Command) MetaSet(key string, value any) *Command {
-	cmd.meta.MetaSet(key, value)
+	cmd.meta[key] = value
 	return cmd
 }
 
 // MetaDelete deletes the metadata variable named by the key. The metadata is
 // shared by all commands in the tree.
-func (cmd *Command) MetaDelete(key string) { cmd.meta.MetaDelete(key) }
+func (cmd *Command) MetaDelete(key string) { delete(cmd.meta, key) }
 
 // MetaAll returns the map backing the metadata shared by all commands in the
 // tree.
-func (cmd *Command) MetaAll() map[string]any { return cmd.meta.MetaAll() }
+func (cmd *Command) MetaAll() map[string]any { return cmd.meta }
 
 // Add adds subcommand(s) to the current command.
 func (cmd *Command) Add(cs ...*Command) *Command {
@@ -148,7 +149,7 @@ func (cmd *Command) Add(cs ...*Command) *Command {
 
 // setMeta sets the metadata collection on the command and all its
 // subcommands at every depth.
-func (cmd *Command) setMeta(meta Meta) {
+func (cmd *Command) setMeta(meta map[string]any) {
 	cmd.meta = meta
 	for _, sub := range cmd.subs {
 		sub.setMeta(meta)
