@@ -4,7 +4,10 @@
 package xcli
 
 import (
+	"context"
 	"errors"
+
+	"github.com/ctx42/ring/pkg/ring"
 )
 
 // ErrTest is a general error used in tests.
@@ -17,6 +20,14 @@ var (
 
 // Describe exports the describe method of [Command] for testing.
 func (cmd *Command) Describe() string { return cmd.describe() }
+
+// Run exports the run method of [Command] for testing.
+func (cmd *Command) Run(ctx context.Context, rng *ring.Ring) error {
+	return cmd.run(ctx, rng)
+}
+
+// RunPreRun exports the runPreRun function for testing.
+var RunPreRun = runPreRun
 
 // TMarshaler is a simple type implementing Marshaler interface.
 type TMarshaler string

@@ -5,9 +5,9 @@
 //
 // A program is a tree of [Command] values. Each command has a name, a flag
 // set, an optional [Func] holding its logic, and subcommands added with
-// [Command.Add]. [Command.Parse] parses the arguments and finds the command
-// to run, and [Command.Run] runs it after the [PreRun] functions of the
-// commands from the root down to it. Commands reach the program environment
+// [Command.Add]. [Command.Execute] parses the arguments, finds the command to
+// run, and runs it after the [PreRun] functions of the commands from the root
+// down to it. Commands reach the program environment
 // and streams through the [github.com/ctx42/ring/pkg/ring.Ring] in their
 // [CmdCtx].
 //
@@ -18,10 +18,7 @@
 //		Add(sub)
 //	root.Flags().BoolSL("help", "h", false, "show help")
 //
-//	if err := root.Parse(os.Args[1:]...); err != nil {
-//		return err
-//	}
-//	return xcli.RunCmd(ctx, ring.New(), root)
+//	return root.Execute(ctx, ring.New())
 package xcli
 
 import (

@@ -28,7 +28,8 @@ environment, and the `xclitest` package wraps that setup for you.
 - Pre-run hooks run from the root command down to the selected one.
 - Metadata shared by every command in the tree.
 - Clear errors for a missing or mistyped subcommand.
-- `RunCmd` turns panics into errors and cancels the context on `SIGTERM`.
+- `Execute` and `RunCmd` turn panics into errors and cancel the context on
+  `SIGTERM`.
 - Terminal detection for standard output and standard error.
 - Test helpers in `xclitest` with captured streams and ready-made commands.
 
@@ -67,12 +68,9 @@ cmd := xcli.NewCommand("hello", greet).
 cmd.Flags().BoolSL("help", "h", false, "show help")
 cmd.Flags().StringSL("name", "n", "World", "who to greet")
 
-// A program passes os.Args[1:] instead.
-if err := cmd.Parse("--name", "gopher"); err != nil {
-	fmt.Println(err)
-	return
-}
-if err := xcli.RunCmd(context.Background(), ring.New(), cmd); err != nil {
+// A program uses ring.New(), which takes the arguments from os.Args.
+rng := ring.New(ring.WithArgs([]string{"--name", "gopher"}))
+if err := cmd.Execute(context.Background(), rng); err != nil {
 	fmt.Println(err)
 }
 // Output:
@@ -80,8 +78,8 @@ if err := xcli.RunCmd(context.Background(), ring.New(), cmd); err != nil {
 ```
 
 `UsageFlagName` tells the command which flag requests help. On `-h` or
-`--help`, `Run` prints the help to the standard error of the ring instead of
-running the command function. The same text comes from `Help`:
+`--help`, `Execute` prints the help to the standard error of the ring
+instead of running the command function. The same text comes from `Help`:
 
 <!-- gmmce:pkg/xcli/ExampleCommand_Help -->
 ```go
@@ -91,7 +89,7 @@ cmd := xcli.NewCommand("hello", nil).
 cmd.Flags().BoolSL("help", "h", false, "show help")
 cmd.Flags().StringSL("name", "n", "World", "who to greet")
 
-// Run prints the same text to standard error on -h or --help.
+// Execute prints the same text to standard error on -h or --help.
 fmt.Print(cmd.Help())
 // Output:
 // Usage of `hello`:
@@ -148,7 +146,7 @@ fmt.Print(root.Help())
 A missing subcommand, a mistyped one, and a broken argument rule each return
 an error that names the problem:
 
-<!-- gmmce:pkg/xcli/ExampleCommand_Run_errors -->
+<!-- gmmce:pkg/xcli/ExampleCommand_Execute_errors -->
 ```go
 nop := func(context.Context, *xcli.CmdCtx) error { return nil }
 newRoot := func() *xcli.Command {
@@ -158,12 +156,8 @@ newRoot := func() *xcli.Command {
 }
 
 for _, args := range [][]string{{}, {"lsit"}, {"add"}} {
-	root := newRoot()
-	if err := root.Parse(args...); err != nil {
-		fmt.Println(err)
-		continue
-	}
-	fmt.Println(root.Run(context.Background(), ring.New()))
+	rng := ring.New(ring.WithArgs(args))
+	fmt.Println(newRoot().Execute(context.Background(), rng))
 }
 // Output:
 // subcommand required for `todo`
@@ -206,11 +200,9 @@ root := xcli.NewCommand("todo", nil).
 	Add(addCmd)
 root.Flags().StringSL("file", "f", "todo.txt", "task list file")
 
-if err := root.Parse("-f", "work.txt", "add", "buy", "milk"); err != nil {
-	fmt.Println(err)
-	return
-}
-if err := root.Run(context.Background(), ring.New()); err != nil {
+args := []string{"-f", "work.txt", "add", "buy", "milk"}
+rng := ring.New(ring.WithArgs(args))
+if err := root.Execute(context.Background(), rng); err != nil {
 	fmt.Println(err)
 }
 // Output:

@@ -409,6 +409,60 @@ func Test_Command_Args(t *testing.T) {
 	assert.Equal(t, []string{"arg0", "arg1"}, have)
 }
 
+func Test_Command_Execute(t *testing.T) {
+	t.Run("success", func(t *testing.T) {
+		// --- Given ---
+		tst := ringtest.New(t).WetStdout()
+		root := xclitest.TstCmd()
+
+		// --- When ---
+		err := root.Execute(t.Context(), tst.Ring("sub-b", "arg0", "arg1"))
+
+		// --- Then ---
+		assert.NoError(t, err)
+		want := "command `sub-b` with args [arg0 arg1]"
+		assert.Equal(t, want, tst.Stdout())
+	})
+
+	t.Run("help requested", func(t *testing.T) {
+		// --- Given ---
+		tst := ringtest.New(t).WetStderr()
+		root := NewCommand("root", xclitest.DbgFunc)
+
+		// --- When ---
+		err := root.Execute(t.Context(), tst.Ring("-h"))
+
+		// --- Then ---
+		assert.NoError(t, err)
+		assert.Equal(t, "Usage of `root`:\n", tst.Stderr())
+	})
+
+	t.Run("error - parse", func(t *testing.T) {
+		// --- Given ---
+		tst := ringtest.New(t)
+		root := xclitest.TstCmd()
+
+		// --- When ---
+		err := root.Execute(t.Context(), tst.Ring("--unknown"))
+
+		// --- Then ---
+		assert.ErrorEqual(t, "flag provided but not defined: -unknown", err)
+	})
+
+	t.Run("error - run", func(t *testing.T) {
+		// --- Given ---
+		tst := ringtest.New(t)
+		fn := func(context.Context, *CmdCtx) error { return ErrTest }
+		root := NewCommand("root", fn)
+
+		// --- When ---
+		err := root.Execute(t.Context(), tst.Ring())
+
+		// --- Then ---
+		assert.ErrorIs(t, ErrTest, err)
+	})
+}
+
 func Test_Command_Parse(t *testing.T) {
 	t.Run("parse flags", func(t *testing.T) {
 		// --- Given ---

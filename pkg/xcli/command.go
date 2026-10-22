@@ -28,7 +28,7 @@ type PreRun func(ctx context.Context, ccx *CmdCtx) (context.Context, error)
 // Unlike the default flag set, the given one keeps its Usage function and
 // output, so on a parse error or a help request [flag.FlagSet] writes to its
 // output (standard error when not set) instead of the [ring.Ring] streams.
-// Set Usage to nil to have [Command.Run] print [Command.Help] instead.
+// Set Usage to nil to have [Command.Execute] print [Command.Help] instead.
 func WithFlags(fs *xflag.FlagSet) func(*Command) {
 	return func(cmd *Command) { cmd.flags = fs }
 }
@@ -76,7 +76,7 @@ type Command struct {
 	// Usage examples and their descriptions.
 	examples [][2]string
 
-	// Set on the root command by Parse to the command Run runs.
+	// Set on the root command by Parse to the command to run.
 	found *Command
 }
 
@@ -204,7 +204,19 @@ func (cmd *Command) Args() []string {
 	return cmd.args
 }
 
-// Parse parses arguments for the command and all subcommands.
+// Execute parses the ring arguments and runs the command they select with
+// [RunCmd]. It is the same as [Command.Parse] with [ring.Ring.Args] followed
+// by [RunCmd].
+func (cmd *Command) Execute(ctx context.Context, rng *ring.Ring) error {
+	if err := cmd.Parse(rng.Args()...); err != nil {
+		return err
+	}
+	return RunCmd(ctx, rng, cmd)
+}
+
+// Parse parses arguments for the command and all subcommands and selects the
+// command [RunCmd] runs. Use it instead of [Command.Execute] to work with the
+// parsed command before running it.
 //
 // Example:
 //
@@ -228,7 +240,7 @@ func (cmd *Command) parse(args []string) (*Command, error) {
 	err := cmd.flags.Parse(args)
 
 	// The [flag.ErrHelp] is returned when there is no formal -h or --help
-	// flag defined. We record it, so the Run method displays help.
+	// flag defined. We record it, so the run method displays help.
 	cmd.helpReq = errors.Is(err, flag.ErrHelp)
 	if err != nil && !cmd.helpReq {
 		return nil, err
@@ -288,9 +300,9 @@ func (cmd *Command) PreRun(fns ...PreRun) *Command {
 	return cmd
 }
 
-// Run runs either found or this command. If pre-run functions were defined,
-// they will be run in the order from root command to the found one.
-func (cmd *Command) Run(ctx context.Context, rng *ring.Ring) (err error) {
+// run runs the command selected by Parse. If pre-run functions were defined,
+// they will be run in the order from root command to the selected one.
+func (cmd *Command) run(ctx context.Context, rng *ring.Ring) (err error) {
 	if cmd.found == nil || !cmd.flags.Parsed() {
 		return errors.New("not parsed arguments")
 	}
@@ -310,7 +322,7 @@ func (cmd *Command) Run(ctx context.Context, rng *ring.Ring) (err error) {
 	if err = found.argsRule.Validate(ccx.Cmd.Args()); err != nil {
 		return fmt.Errorf("command %#q %w", found.Name(), err)
 	}
-	if ctx, err = RunPreRun(ctx, ccx); err != nil {
+	if ctx, err = runPreRun(ctx, ccx); err != nil {
 		return err
 	}
 
@@ -324,14 +336,14 @@ func (cmd *Command) Run(ctx context.Context, rng *ring.Ring) (err error) {
 	return fn(ctx, ccx)
 }
 
-// RunPreRun runs all the pre-run functions in the command chain starting at
+// runPreRun runs all the pre-run functions in the command chain starting at
 // root.
-func RunPreRun(ctx context.Context, ccx *CmdCtx) (context.Context, error) {
+func runPreRun(ctx context.Context, ccx *CmdCtx) (context.Context, error) {
 	var err error
 	if ccx.Cmd.parent != nil {
 		orig := ccx.Cmd
 		ccx.Cmd = ccx.Cmd.parent
-		ctx, err = RunPreRun(ctx, ccx)
+		ctx, err = runPreRun(ctx, ccx)
 		ccx.Cmd = orig
 		if err != nil {
 			return nil, err

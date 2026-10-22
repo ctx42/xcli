@@ -26,12 +26,9 @@ func ExampleCommand() {
 	cmd.Flags().BoolSL("help", "h", false, "show help")
 	cmd.Flags().StringSL("name", "n", "World", "who to greet")
 
-	// A program passes os.Args[1:] instead.
-	if err := cmd.Parse("--name", "gopher"); err != nil {
-		fmt.Println(err)
-		return
-	}
-	if err := xcli.RunCmd(context.Background(), ring.New(), cmd); err != nil {
+	// A program uses ring.New(), which takes the arguments from os.Args.
+	rng := ring.New(ring.WithArgs([]string{"--name", "gopher"}))
+	if err := cmd.Execute(context.Background(), rng); err != nil {
 		fmt.Println(err)
 	}
 	// Output:
@@ -45,7 +42,7 @@ func ExampleCommand_Help() {
 	cmd.Flags().BoolSL("help", "h", false, "show help")
 	cmd.Flags().StringSL("name", "n", "World", "who to greet")
 
-	// Run prints the same text to standard error on -h or --help.
+	// Execute prints the same text to standard error on -h or --help.
 	fmt.Print(cmd.Help())
 	// Output:
 	// Usage of `hello`:
@@ -92,7 +89,7 @@ func ExampleCommand_Add() {
 	//   list          list tasks
 }
 
-func ExampleCommand_Run_errors() {
+func ExampleCommand_Execute_errors() {
 	nop := func(context.Context, *xcli.CmdCtx) error { return nil }
 	newRoot := func() *xcli.Command {
 		addCmd := xcli.NewCommand("add", nop).ArgsRule(xcli.MinArgsRule(1))
@@ -101,12 +98,8 @@ func ExampleCommand_Run_errors() {
 	}
 
 	for _, args := range [][]string{{}, {"lsit"}, {"add"}} {
-		root := newRoot()
-		if err := root.Parse(args...); err != nil {
-			fmt.Println(err)
-			continue
-		}
-		fmt.Println(root.Run(context.Background(), ring.New()))
+		rng := ring.New(ring.WithArgs(args))
+		fmt.Println(newRoot().Execute(context.Background(), rng))
 	}
 	// Output:
 	// subcommand required for `todo`
@@ -136,11 +129,9 @@ func ExampleCommand_PreRun() {
 		Add(addCmd)
 	root.Flags().StringSL("file", "f", "todo.txt", "task list file")
 
-	if err := root.Parse("-f", "work.txt", "add", "buy", "milk"); err != nil {
-		fmt.Println(err)
-		return
-	}
-	if err := root.Run(context.Background(), ring.New()); err != nil {
+	args := []string{"-f", "work.txt", "add", "buy", "milk"}
+	rng := ring.New(ring.WithArgs(args))
+	if err := root.Execute(context.Background(), rng); err != nil {
 		fmt.Println(err)
 	}
 	// Output:

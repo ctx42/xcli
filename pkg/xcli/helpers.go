@@ -41,9 +41,9 @@ func Marshal(v any) ([]byte, error) {
 	return fmt.Appendf(nil, "%v", v), nil
 }
 
-// RunCmd executes command and recovers from panics. A recovered panic is
-// returned as an error. The context passed to the command is canceled on
-// SIGTERM.
+// RunCmd runs the command selected by a successful [Command.Parse] on the
+// root command and recovers from panics. A recovered panic is returned as an
+// error. The context passed to the command is canceled on SIGTERM.
 func RunCmd(ctx context.Context, rng *ring.Ring, cmd *Command) (err error) {
 	defer func() {
 		rec := recover()
@@ -64,7 +64,7 @@ func RunCmd(ctx context.Context, rng *ring.Ring, cmd *Command) (err error) {
 
 	ctx, cxl := signal.NotifyContext(ctx, syscall.SIGTERM)
 	defer cxl()
-	return cmd.Run(ctx, rng)
+	return cmd.run(ctx, rng)
 }
 
 // DetectTTY detects if standard output and error are terminals and sets
