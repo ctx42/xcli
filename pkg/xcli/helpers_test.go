@@ -226,8 +226,12 @@ func Test_DetectTTY_IsStdOutTTY_IsStdErrTTY(t *testing.T) {
 		tst := ringtest.New(t)
 		rng := tst.Ring()
 
+		// --- When ---
+		hOut := IsStdOutTTY(rng)
+		hErr := IsStdErrTTY(rng)
+
 		// --- Then ---
-		assert.False(t, IsStdOutTTY(rng))
-		assert.False(t, IsStdErrTTY(rng))
+		assert.False(t, hOut)
+		assert.False(t, hErr)
 	})
 }

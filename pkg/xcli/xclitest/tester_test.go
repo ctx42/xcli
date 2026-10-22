@@ -164,6 +164,9 @@ func Test_Tester_WetStdout(t *testing.T) {
 
 		// --- When ---
 		_, _ = io.WriteString(tst.Streams().Stdout(), "abc")
+
+		// --- Then ---
+		// The spy checks the expected error when the test cleans up.
 	})
 }
 
@@ -202,6 +205,9 @@ func Test_Tester_WetStderr(t *testing.T) {
 
 		// --- When ---
 		_, _ = io.WriteString(tst.Streams().Stderr(), "abc")
+
+		// --- Then ---
+		// The spy checks the expected error when the test cleans up.
 	})
 }
 

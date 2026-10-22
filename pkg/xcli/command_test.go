@@ -515,18 +515,27 @@ func Test_Command_Find(t *testing.T) {
 }
 
 func Test_Command_PreRun_RunPreRun(t *testing.T) {
-	t.Run("error - pre run", func(t *testing.T) {
+	t.Run("returns command", func(t *testing.T) {
 		// --- Given ---
-		pre := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
-			return nil, ErrTest
+		pre := func(ctx context.Context, _ *CmdCtx) (context.Context, error) {
+			return ctx, nil
 		}
-		cmd, ccx := xclitest.New(t).CmdAndCtx("root", nil)
+		cmd := NewCommand("root", nil)
 
 		// --- When ---
 		have := cmd.PreRun(pre)
 
 		// --- Then ---
 		assert.Same(t, cmd, have)
+	})
+
+	t.Run("error - pre run", func(t *testing.T) {
+		// --- Given ---
+		pre := func(_ context.Context, _ *CmdCtx) (context.Context, error) {
+			return nil, ErrTest
+		}
+		cmd, ccx := xclitest.New(t).CmdAndCtx("root", nil)
+		cmd.PreRun(pre)
 
 		// --- When ---
 		haveCtx, err := RunPreRun(t.Context(), ccx)
@@ -550,12 +559,7 @@ func Test_Command_PreRun_RunPreRun(t *testing.T) {
 		}
 
 		cmd, ccx := xclitest.New(t).CmdAndCtx("root", nil)
-
-		// --- When ---
-		have := cmd.PreRun(pre0, pre1)
-
-		// --- Then ---
-		assert.Same(t, cmd, have)
+		cmd.PreRun(pre0, pre1)
 
 		// --- When ---
 		haveCtx, err := RunPreRun(t.Context(), ccx)
@@ -814,6 +818,7 @@ func Test_Command_Run(t *testing.T) {
 }
 
 func Test_Command_GetFlagSet(t *testing.T) {
+	// --- Given ---
 	subA := NewCommand("sub-a", xclitest.DbgFunc)
 	subA.Int("sa", 42, "sa-desc")
 
