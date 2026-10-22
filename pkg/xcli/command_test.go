@@ -416,7 +416,7 @@ func Test_Command_Parse(t *testing.T) {
 		assert.NoError(t, err)
 	})
 
-	t.Run("sub subcommand help requested", func(t *testing.T) {
+	t.Run("subcommand help flag not defined", func(t *testing.T) {
 		// --- Given ---
 		subA := NewCommand("sub-a", xclitest.DbgFunc)
 		root := NewCommand("root", xclitest.DbgFunc).Add(subA)
