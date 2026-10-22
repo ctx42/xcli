@@ -74,8 +74,9 @@ func RunCmd(ctx context.Context, rng *ring.Ring, cmd *Command) (err error) {
 }
 
 // DetectTTY detects if standard output and error are terminals and sets
-// [MetaKeySOTerm] and [MetaKeySETerm] accordingly. If the [MetaKeySOTerm] and
-// [MetaKeySETerm] are already set, it will not change their values.
+// [MetaKeySOTerm] and [MetaKeySETerm] accordingly. It sets [MetaKeyColor] to
+// false when the NO_COLOR environment variable is set to a non-empty value,
+// and to true otherwise. It does not change a key that is already set.
 func DetectTTY(rng *ring.Ring) *ring.Ring {
 	if val := rng.MetaGet(MetaKeySOTerm); val == nil {
 		var soTTY bool
@@ -91,6 +92,10 @@ func DetectTTY(rng *ring.Ring) *ring.Ring {
 			seTTY = isatty.IsTerminal(eout.Fd())
 		}
 		rng.MetaSet(MetaKeySETerm, seTTY)
+	}
+
+	if val := rng.MetaGet(MetaKeyColor); val == nil {
+		rng.MetaSet(MetaKeyColor, rng.EnvGet("NO_COLOR") == "")
 	}
 	return rng
 }

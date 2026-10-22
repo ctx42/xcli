@@ -41,7 +41,7 @@ const (
 	MetaKeySETerm = "cli-meta-eout-term"
 
 	// MetaKeyColor is the metadata key of a boolean value which is true when
-	// the program can use terminal colors.
+	// the program can use terminal colors. [DetectTTY] sets it.
 	MetaKeyColor = "cli-meta-color"
 )
 

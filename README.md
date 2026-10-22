@@ -30,7 +30,8 @@ environment, and the `xclitest` package wraps that setup for you.
 - Clear errors for a missing or mistyped subcommand.
 - `Execute` and `RunCmd` turn panics into errors and cancel the context on
   `SIGINT` and `SIGTERM`.
-- Terminal detection for standard output and standard error.
+- Terminal and color detection for standard output and standard error,
+  honoring `NO_COLOR`.
 - Test helpers in `xclitest` with captured streams and ready-made command
   functions.
 
@@ -216,7 +217,9 @@ A subcommand can also read a flag of any ancestor directly with
 ### Terminal detection
 
 `DetectTTY` records in the ring metadata whether standard output and standard
-error are terminals. Read the result with `IsStdOutTTY` and `IsStdErrTTY`:
+error are terminals. Read the result with `IsStdOutTTY` and `IsStdErrTTY`.
+It also stores under `MetaKeyColor` whether colors are allowed: they are,
+unless the `NO_COLOR` environment variable is set to a non-empty value.
 
 <!-- gmmce:pkg/xcli/ExampleDetectTTY -->
 ```go

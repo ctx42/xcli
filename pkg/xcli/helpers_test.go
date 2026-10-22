@@ -11,6 +11,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ctx42/ring/pkg/ring"
 	"github.com/ctx42/ring/pkg/ring/ringtest"
 	"github.com/ctx42/testing/pkg/assert"
 	"github.com/ctx42/testkit/pkg/oskit"
@@ -255,6 +256,53 @@ func Test_DetectTTY_IsStdOutTTY_IsStdErrTTY(t *testing.T) {
 		// --- Then ---
 		assert.True(t, IsStdOutTTY(have))
 		assert.True(t, IsStdErrTTY(have))
+	})
+
+	t.Run("color allowed", func(t *testing.T) {
+		// --- Given ---
+		rng := ringtest.New(t, ring.WithEnv([]string{})).Ring()
+
+		// --- When ---
+		have := DetectTTY(rng)
+
+		// --- Then ---
+		assert.Equal(t, true, have.MetaGet(MetaKeyColor))
+	})
+
+	t.Run("NO_COLOR disables color", func(t *testing.T) {
+		// --- Given ---
+		env := []string{"NO_COLOR=1"}
+		rng := ringtest.New(t, ring.WithEnv(env)).Ring()
+
+		// --- When ---
+		have := DetectTTY(rng)
+
+		// --- Then ---
+		assert.Equal(t, false, have.MetaGet(MetaKeyColor))
+	})
+
+	t.Run("empty NO_COLOR keeps color", func(t *testing.T) {
+		// --- Given ---
+		env := []string{"NO_COLOR="}
+		rng := ringtest.New(t, ring.WithEnv(env)).Ring()
+
+		// --- When ---
+		have := DetectTTY(rng)
+
+		// --- Then ---
+		assert.Equal(t, true, have.MetaGet(MetaKeyColor))
+	})
+
+	t.Run("will not override color", func(t *testing.T) {
+		// --- Given ---
+		rng := ringtest.New(t, ring.WithEnv([]string{})).Ring()
+		rng.MetaSet(MetaKeyColor, false)
+
+		// --- When ---
+		have := DetectTTY(rng)
+
+		// --- Then ---
+		assert.Equal(t, false, have.MetaGet(MetaKeyColor))
 	})
 
 	t.Run("metadata is not set", func(t *testing.T) {
