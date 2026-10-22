@@ -99,7 +99,7 @@ fmt.Print(cmd.Help())
 //
 // OPTIONS:
 //   -h, --help    show help
-//   -n, --name    who to greet
+//   -n, --name    who to greet (default "World")
 ```
 
 ### Subcommands
@@ -136,7 +136,7 @@ fmt.Print(root.Help())
 //   todo -f work.txt list    # list tasks in work.txt
 //
 // OPTIONS:
-//   -f, --file    task list file
+//   -f, --file    task list file (default "todo.txt")
 //   -h, --help    show help
 //
 // COMMANDS:

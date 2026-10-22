@@ -51,7 +51,7 @@ func ExampleCommand_Help() {
 	//
 	// OPTIONS:
 	//   -h, --help    show help
-	//   -n, --name    who to greet
+	//   -n, --name    who to greet (default "World")
 }
 
 func ExampleCommand_Add() {
@@ -81,7 +81,7 @@ func ExampleCommand_Add() {
 	//   todo -f work.txt list    # list tasks in work.txt
 	//
 	// OPTIONS:
-	//   -f, --file    task list file
+	//   -f, --file    task list file (default "todo.txt")
 	//   -h, --help    show help
 	//
 	// COMMANDS:

@@ -915,7 +915,7 @@ func Test_Command_Run(t *testing.T) {
 			"\n" +
 			"OPTIONS:\n" +
 			"  -h, --help    sub-b-help\n" +
-			"      --sb      sb-help\n" +
+			"      --sb      sb-help (default \"sb-def\")\n" +
 			"\n" +
 			"COMMANDS:\n" +
 			"  sub-b-a       subcommand BA\n"
@@ -954,7 +954,7 @@ func Test_Command_Run(t *testing.T) {
 			"\n" +
 			"OPTIONS:\n" +
 			"  -h, --help    sub-b-a-help\n" +
-			"      --sba     sba-help\n"
+			"      --sba     sba-help (default \"sba-def\")\n"
 		assert.Equal(t, want, tst.Stdout())
 		assert.Empty(t, root.Args())
 	})
@@ -1114,7 +1114,7 @@ func Test_Command_Help(t *testing.T) {
 			"\n" +
 			"OPTIONS:\n" +
 			"  -h, --help    root-help\n" +
-			"  -r, --root    root-help\n" +
+			"  -r, --root    root-help (default \"root-def\")\n" +
 			"\n" +
 			"COMMANDS:\n" +
 			"  sub-a         subcommand A\n" +
@@ -1136,7 +1136,7 @@ func Test_Command_Help(t *testing.T) {
 			"\n" +
 			"OPTIONS:\n" +
 			"  -h, --help    sub-b-help\n" +
-			"      --sb      sb-help\n" +
+			"      --sb      sb-help (default \"sb-def\")\n" +
 			"\n" +
 			"COMMANDS:\n" +
 			"  sub-b-a       subcommand BA\n"
@@ -1174,6 +1174,33 @@ func Test_Command_Help(t *testing.T) {
 
 		// --- Then ---
 		want := "Usage of `cmd`:\n\nEXAMPLES:\n  cmd    # do it\n"
+		assert.Equal(t, want, have)
+	})
+
+	t.Run("flag defaults", func(t *testing.T) {
+		// --- Given ---
+		cmd := NewCommand("cmd", nil)
+		cmd.Flags().String("str", "abc", "string flag")
+		cmd.Flags().String("empty", "", "empty string flag")
+		cmd.Flags().Int("int", 42, "int flag")
+		cmd.Flags().Int("zero", 0, "zero int flag")
+		cmd.Flags().Bool("bool", true, "bool flag")
+		cmd.Flags().Bool("off", false, "false bool flag")
+
+		// --- When ---
+		have := cmd.Help()
+
+		// --- Then ---
+		want := "" +
+			"Usage of `cmd`:\n" +
+			"\n" +
+			"OPTIONS:\n" +
+			"      --bool     bool flag (default true)\n" +
+			"      --empty    empty string flag\n" +
+			"      --int      int flag (default 42)\n" +
+			"      --off      false bool flag\n" +
+			"      --str      string flag (default \"abc\")\n" +
+			"      --zero     zero int flag\n"
 		assert.Equal(t, want, have)
 	})
 

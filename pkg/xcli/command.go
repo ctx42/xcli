@@ -10,6 +10,8 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"reflect"
+	"strconv"
 	"strings"
 	"text/tabwriter"
 
@@ -472,7 +474,7 @@ func (cmd *Command) help() string {
 		_, _ = fmt.Fprintf(tw, "\t\n")
 		_, _ = fmt.Fprintf(tw, "OPTIONS:\t\n")
 		for _, opt := range opts {
-			_, _ = fmt.Fprint(tw, opt)
+			_, _ = fmt.Fprint(tw, withDefault(cmd.flags, opt))
 		}
 	}
 
@@ -485,4 +487,44 @@ func (cmd *Command) help() string {
 	}
 	_ = tw.Flush()
 	return buf.String()
+}
+
+// withDefault appends the default value of the flag a help option line
+// describes, unless the default is the zero value of the flag type. String
+// defaults are quoted.
+func withDefault(fs *xflag.FlagSet, line string) string {
+	start := strings.Index(line, "--")
+	end := strings.IndexByte(line, '\t')
+	if start < 0 || end < start {
+		return line
+	}
+	flg := fs.Lookup(line[start+2 : end])
+	if flg == nil || isZeroValue(flg) {
+		return line
+	}
+	def := flg.DefValue
+	if get, ok := flg.Value.(flag.Getter); ok {
+		if _, ok = get.Get().(string); ok {
+			def = strconv.Quote(def)
+		}
+	}
+	return strings.TrimSuffix(line, "\n") + " (default " + def + ")\n"
+}
+
+// isZeroValue reports whether the default value of the flag is the zero value
+// of its type. A flag value whose zero value panics on String counts as zero.
+func isZeroValue(flg *flag.Flag) (zero bool) {
+	defer func() {
+		if recover() != nil {
+			zero = true
+		}
+	}()
+	typ := reflect.TypeOf(flg.Value)
+	var val reflect.Value
+	if typ.Kind() == reflect.Pointer {
+		val = reflect.New(typ.Elem())
+	} else {
+		val = reflect.Zero(typ)
+	}
+	return flg.DefValue == val.Interface().(flag.Value).String()
 }
