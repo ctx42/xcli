@@ -1,3 +1,6 @@
+## v0.1.1 (Fri, 23 Oct 2026 20:08:47 UTC)
+- chore(deps): update dependencies.
+
 ## v0.1.0 (Thu, 22 Oct 2026 20:36:47 UTC)
 - chore: scaffold project.
 - docs: add MIT license.
